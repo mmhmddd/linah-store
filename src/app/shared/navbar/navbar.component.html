@@ -1,0 +1,79 @@
+<nav class="navbar navbar-expand-lg" dir="rtl" lang="ar">
+  <div class="container-fluid d-flex align-items-center">
+    <a class="navbar-brand" routerLink="/">
+      <img src="/assets/images/logo.png" alt="شعار متجر لينا للأطفال" class="logo-img">
+      <h1 class="brand-text">{{ brandText }}</h1>
+    </a>
+
+    <button
+      class="navbar-toggler d-lg-none"
+      type="button"
+      (click)="toggleMobileMenu()"
+      [attr.aria-expanded]="isMobileMenuOpen"
+      aria-label="تبديل القائمة">
+      <span class="navbar-toggler-icon"><span></span></span>
+    </button>
+
+    <div class="navbar-collapse" [class.show]="isMobileMenuOpen" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item" *ngFor="let item of mainMenu; let i = index">
+          <a
+            class="nav-link"
+            [routerLink]="item.link"
+            routerLinkActive="router-link-active"
+            [routerLinkActiveOptions]="{ exact: i === 0 }"
+            (click)="toggleMobileMenu()">
+            <i class="bi {{ item.icon }}"></i>
+            {{ item.text }}
+          </a>
+        </li>
+      </ul>
+
+      <div class="navbar-actions d-flex align-items-center">
+        <a class="action-link" routerLink="/favourite" title="{{ favouriteText }}" (click)="toggleMobileMenu()">
+          <i class="bi bi-heart-fill"></i>
+          <span class="action-text">{{ favouriteText }}</span>
+        </a>
+
+        <a class="action-link cart-link" routerLink="/cart" title="{{ cartText }}" (click)="toggleMobileMenu()">
+          <i class="bi bi-cart-fill"></i>
+          <span class="action-text">{{ cartText }}</span>
+        </a>
+
+        <div class="user-section" *ngIf="isLoggedIn; else loginButton">
+          <div class="dropdown">
+            <button class="dropdown-toggle user-avatar" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="/assets/images/user-avatar.png" alt="صورة المستخدم" class="user-avatar">
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+              <ng-container *ngFor="let item of dropdownItems">
+                <li *ngIf="item.link">
+                  <a class="dropdown-item" [routerLink]="item.link" (click)="toggleMobileMenu()">
+                    <i class="bi {{ item.icon }}"></i>
+                    {{ item.text }}
+                  </a>
+                </li>
+                <li *ngIf="item.action">
+                  <button class="dropdown-item" (click)="item.action(); toggleMobileMenu()">
+                    <i class="bi {{ item.icon }}"></i>
+                    {{ item.text }}
+                  </button>
+                </li>
+                <li *ngIf="item.separator">
+                  <hr class="dropdown-divider">
+                </li>
+              </ng-container>
+            </ul>
+          </div>
+        </div>
+
+        <ng-template #loginButton>
+          <a class="action-link login-btn" routerLink="/login" (click)="toggleMobileMenu()">
+            <i class="bi bi-box-arrow-in-right"></i>
+            <span class="action-text">{{ loginText }}</span>
+          </a>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</nav>
