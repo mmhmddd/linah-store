@@ -1,1 +1,307 @@
-<p>home works!</p>
+<!-- home.component.html -->
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800&family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<section class="hero-section" dir="rtl" lang="ar">
+  <div class="hero-slider">
+    <div class="hero-slide active" style="background-image: url('/assets/images/home/heroimg.jpg');"></div>
+    <div class="hero-slide" style="background-image: url('/assets/images/home/heroimg2.jpg');"></div>
+    <div class="hero-slide" style="background-image: url('/assets/images/home/heroimg3.jpg');"></div>
+    <div class="water-overlay"></div>
+    <div class="floating-shapes">
+      <div class="shape shape-1">⭐</div>
+      <div class="shape shape-2">🌙</div>
+      <div class="shape shape-3">☀️</div>
+      <div class="shape shape-4">🎈</div>
+      <div class="shape shape-5">🦋</div>
+      <div class="shape shape-6">🌈</div>
+    </div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-icon">📚</div>
+    <h1 class="hero-title">مرحبًا بك في عالم الخيال السحري</h1>
+    <p class="hero-subtitle">اكتشف عالمًا مليئًا بالمغامرات والقصص الرائعة</p>
+    <a routerLink="/explore" class="hero-cta">
+      <span class="cta-icon">🚀</span>
+      استكشف الآن
+      <span class="cta-sparkle">✨</span>
+    </a>
+  </div>
+</section>
+
+<section class="our-sections" dir="rtl" lang="ar">
+  <div class="container">
+    <div class="section-header">
+      <h1 class="section-title">
+        <span class="title-decoration">🎪</span>
+        أقسامنا المميزة
+        <span class="title-decoration">🎪</span>
+      </h1>
+      <p class="section-description">اختر القسم المفضل لديك وابدأ رحلة التعلم والمرح</p>
+    </div>
+    <div class="sections-grid">
+      <div class="section-card all-products-card">
+        <div class="card-badge">🏆 الأكثر شعبية</div>
+        <div class="card-image" style="background-image: url('/assets/images/home/Add a subheading.png');"></div>
+        <div class="card-content">
+          <div class="card-icon">🛍️</div>
+          <h2 class="card-title">جميع المنتجات</h2>
+          <p class="card-description">اكتشف مجموعتنا الكاملة من الكتب والقصص المثيرة</p>
+          <a routerLink="/products" class="card-button">
+            <span class="button-text">استكشف المنتجات</span>
+            <span class="button-arrow">→</span>
+          </a>
+        </div>
+      </div>
+      <div class="section-card stories-card">
+        <div class="card-badge">📖 جديد</div>
+        <div class="card-image" style="background-image: url('/assets/images/home/Add a subheading (1).png');"></div>
+        <div class="card-content">
+          <div class="card-icon">🌟</div>
+          <h2 class="card-title">قصص الأطفال</h2>
+          <p class="card-description">قصص مليئة بالمغامرات والدروس القيمة</p>
+          <a routerLink="/stories" class="card-button">
+            <span class="button-text">استكشف القصص</span>
+            <span class="button-arrow">→</span>
+          </a>
+        </div>
+      </div>
+      <div class="section-card books-card">
+        <div class="card-badge">📚 مميز</div>
+        <div class="card-image" style="background-image: url('/assets/images/home/Add a subheading (2).png');"></div>
+        <div class="card-content">
+          <div class="card-icon">🎨</div>
+          <h2 class="card-title">كتب الأطفال</h2>
+          <p class="card-description">كتب تعليمية وترفيهية تنمي خيال طفلك</p>
+          <a routerLink="/books" class="card-button">
+            <span class="button-text">تصفح الكتب</span>
+            <span class="button-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="achievements-section" dir="rtl" lang="ar">
+  <div class="floating-elements">
+    <div class="floating-element element-1">🎯</div>
+    <div class="floating-element element-2">🏅</div>
+    <div class="floating-element element-3">🌟</div>
+    <div class="floating-element element-4">🎉</div>
+    <div class="floating-element element-5">💫</div>
+  </div>
+  <div class="container">
+    <div class="section-header">
+      <h1 class="section-title achievement-title">
+        <span class="title-icon">🏆</span>
+        إنجازاتنا الرائعة
+      </h1>
+      <h2 class="section-subtitle">أرقام تحكي قصة نجاحنا معكم</h2>
+    </div>
+    <div class="achievements-grid">
+      <div class="achievement-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="achievement-icon">📅</div>
+        <h3 class="achievement-number" id="years-experience">0+</h3>
+        <p class="achievement-label">سنة خبرة</p>
+        <div class="achievement-decor"></div>
+        <div class="card-sparkles">
+          <span class="sparkle">✨</span>
+          <span class="sparkle">✨</span>
+          <span class="sparkle">✨</span>
+        </div>
+      </div>
+      <div class="achievement-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="achievement-icon">📖</div>
+        <h3 class="achievement-number" id="books">0+</h3>
+        <p class="achievement-label">كتاب</p>
+        <div class="achievement-decor"></div>
+        <div class="card-sparkles">
+          <span class="sparkle">✨</span>
+          <span class="sparkle">✨</span>
+          <span class="sparkle">✨</span>
+        </div>
+      </div>
+      <div class="achievement-card" data-aos="fade-up" data-aos-delay="300">
+        <div class="achievement-icon">📚</div>
+        <h3 class="achievement-number" id="stories">0+</h3>
+        <p class="achievement-label">قصص</p>
+        <div class="achievement-decor"></div>
+        <div class="card-sparkles">
+          <span class="sparkle">✨</span>
+          <span class="sparkle">✨</span>
+          <span class="sparkle">✨</span>
+        </div>
+      </div>
+      <div class="achievement-card" data-aos="fade-up" data-aos-delay="400">
+        <div class="achievement-icon">🏅</div>
+        <h3 class="achievement-number" id="awards">0+</h3>
+        <p class="achievement-label">جوائز</p>
+        <div class="achievement-decor"></div>
+        <div class="card-sparkles">
+          <span class="sparkle">✨</span>
+          <span class="sparkle">✨</span>
+          <span class="sparkle">✨</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="latest-books-section" dir="rtl" lang="ar">
+  <div class="container">
+    <div class="section-header">
+      <h1 class="section-title">
+        <span class="title-decoration">📚</span>
+        أحدث الكتب المثيرة
+        <span class="title-decoration">📚</span>
+      </h1>
+      <p class="section-description">اكتشف أجمل الكتب الجديدة التي ستأخذك في رحلة مشوقة</p>
+    </div>
+    <div class="books-slider-container">
+      <div class="swiper books-slider">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide book-card">
+            <div class="book-rating">
+              <span class="star">⭐</span>
+              <span class="star">⭐</span>
+              <span class="star">⭐</span>
+              <span class="star">⭐</span>
+              <span class="star">⭐</span>
+            </div>
+            <div class="book-card-slideshow">
+              <div class="book-slide active" style="background-image: url('/assets/images/home/book3.jpg');"></div>
+              <div class="book-slide" style="background-image: url('/assets/images/home/book2.jpg');"></div>
+              <div class="book-slide" style="background-image: url('/assets/images/home/book1.jpg');"></div>
+            </div>
+            <div class="book-content">
+              <div class="book-category-badge">🌳 مغامرات</div>
+              <h2 class="book-title">مغامرات في الغابة السحرية</h2>
+              <p class="book-description">انطلق في رحلة مثيرة مع الأصدقاء في الغابة المليئة بالأسرار</p>
+              <div class="book-price-container">
+                <span class="book-price">324.00 ج.م</span>
+                <span class="price-badge">عرض خاص</span>
+              </div>
+              <div class="book-actions">
+                <button class="action-button cart-button" aria-label="أضف إلى السلة">
+                  <i class="fas fa-cart-plus"></i>
+                  <span class="button-tooltip">أضف للسلة</span>
+                </button>
+                <button class="action-button favorite-button" aria-label="أضف إلى المفضلة">
+                  <i class="fas fa-heart"></i>
+                  <span class="button-tooltip">المفضلة</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="swiper-slide book-card">
+            <div class="book-rating">
+              <span class="star">⭐</span>
+              <span class="star">⭐</span>
+              <span class="star">⭐</span>
+              <span class="star">⭐</span>
+              <span class="star">⭐</span>
+            </div>
+            <div class="book-card-slideshow">
+              <div class="book-slide active" style="background-image: url('/assets/images/home/book2.jpg');"></div>
+              <div class="book-slide" style="background-image: url('/assets/images/home/book3.jpg');"></div>
+              <div class="book-slide" style="background-image: url('/assets/images/home/book2.jpg');"></div>
+            </div>
+            <div class="book-content">
+              <div class="book-category-badge">🌊 خيال</div>
+              <h2 class="book-title">أسرار البحر الأزرق</h2>
+              <p class="book-description">اكتشف عجائب البحار وتعرف على أصدقاء جدد تحت الماء</p>
+              <div class="book-price-container">
+                <span class="book-price">388.80 ج.م</span>
+                <span class="price-badge">الأكثر مبيعًا</span>
+              </div>
+              <div class="book-actions">
+                <button class="action-button cart-button" aria-label="أضف إلى السلة">
+                  <i class="fas fa-cart-plus"></i>
+                  <span class="button-tooltip">أضف للسلة</span>
+                </button>
+                <button class="action-button favorite-button" aria-label="أضف إلى المفضلة">
+                  <i class="fas fa-heart"></i>
+                  <span class="button-tooltip">المفضلة</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="swiper-slide book-card">
+            <div class="book-rating">
+              <span class="star">⭐</span>
+              <span class="star">⭐</span>
+              <span class="star">⭐</span>
+              <span class="star">⭐</span>
+              <span class="star">⭐</span>
+            </div>
+            <div class="book-card-slideshow">
+              <div class="book-slide active" style="background-image: url('/assets/images/home/heroimg3.jpg');"></div>
+              <div class="book-slide" style="background-image: url('/assets/images/home/heroimg2.jpg');"></div>
+              <div class="book-slide" style="background-image: url('/assets/images/home/heroimg3.jpg');"></div>
+            </div>
+            <div class="book-content">
+              <div class="book-category-badge">🚀 علمي</div>
+              <h2 class="book-title">رحلة عبر الزمن</h2>
+              <p class="book-description">سافر عبر الزمن واكتشف أسرار الماضي والمستقبل</p>
+              <div class="book-price-container">
+                <span class="book-price">362.88 ج.م</span>
+                <span class="price-badge">جديد</span>
+              </div>
+              <div class="book-actions">
+                <button class="action-button cart-button" aria-label="أضف إلى السلة">
+                  <i class="fas fa-cart-plus"></i>
+                  <span class="button-tooltip">أضف للسلة</span>
+                </button>
+                <button class="action-button favorite-button" aria-label="أضف إلى المفضلة">
+                  <i class="fas fa-heart"></i>
+                  <span class="button-tooltip">المفضلة</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="swiper-slide book-card">
+            <div class="book-rating">
+              <span class="star">⭐</span>
+              <span class="star">⭐</span>
+              <span class="star">⭐</span>
+              <span class="star">⭐</span>
+              <span class="star">⭐</span>
+            </div>
+            <div class="book-card-slideshow">
+              <div class="book-slide active" style="background-image: url('/assets/images/home/book1.jpg');"></div>
+              <div class="book-slide" style="background-image: url('/assets/images/home/book2.jpg');"></div>
+              <div class="book-slide" style="background-image: url('/assets/images/home/book3.jpg');"></div>
+            </div>
+            <div class="book-content">
+              <div class="book-category-badge">👵 تراثي</div>
+              <h2 class="book-title">حكايات الجدة الحكيمة</h2>
+              <p class="book-description">استمع لأجمل الحكايات التراثية المليئة بالحكمة والمرح</p>
+              <div class="book-price-container">
+                <span class="book-price">259.20 ج.م</span>
+                <span class="price-badge">مفضل الأطفال</span>
+              </div>
+              <div class="book-actions">
+                <button class="action-button cart-button" aria-label="أضف إلى السلة">
+                  <i class="fas fa-cart-plus"></i>
+                  <span class="button-tooltip">أضف للسلة</span>
+                </button>
+                <button class="action-button favorite-button" aria-label="أضف إلى المفضلة">
+                  <i class="fas fa-heart"></i>
+                  <span class="button-tooltip">المفضلة</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="slider-nav next">
+        <span class="nav-icon">◀️</span>
+      </button>
+      <button class="slider-nav prev">
+        <span class="nav-icon">▶️</span>
+      </button>
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+</section>

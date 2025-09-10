@@ -1,1 +1,73 @@
-<p>footer works!</p>
+<footer class="footer" dir="rtl" lang="ar">
+  <div class="container-fluid">
+    <div class="floating-emojis">
+      <span class="emoji">📚</span>
+      <span class="emoji">⭐</span>
+      <span class="emoji">🚀</span>
+      <span class="emoji">🌟</span>
+      <span class="emoji">🎈</span>
+      <span class="emoji">🦋</span>
+    </div>
+    <div class="footer-content">
+      <div class="footer-section brand-section">
+        <a class="footer-brand" routerLink="/">
+          <img src="/assets/images/logo.png" alt="شعار متجر لينا للأطفال" class="footer-logo-img">
+          <h2 class="brand-text">
+            <span class="main-title">لينه</span>
+            <span class="sub-title">ثمارها اطفالها</span>
+          </h2>
+        </a>
+        <p class="brand-description">متجر لينه يقدم أفضل الكتب والمنتجات التعليمية للأطفال لتعزيز الإبداع والتعلم.</p>
+      </div>
+
+      <div class="footer-section quick-links">
+        <h3 class="section-title">روابط سريعة</h3>
+        <ul class="footer-nav">
+          <li *ngFor="let item of mainMenu">
+            <a class="footer-link" [routerLink]="item.link">
+              <i class="bi {{ item.icon }}"></i>
+              {{ item.text }}
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="footer-section contact-info">
+        <h3 class="section-title">تواصلوا معنا</h3>
+        <ul class="contact-list">
+          <li>
+            <i class="bi bi-telephone-fill"></i>
+            <span>01115000562</span>
+          </li>
+          <li>
+            <i class="bi bi-envelope-fill"></i>
+            <span>linahstore1&#64;gmail.com</span>
+          </li>
+          <li>
+            <i class="bi bi-geo-alt-fill"></i>
+            <span>القاهرة</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="footer-section social-media">
+        <h3 class="section-title">تابعونا</h3>
+        <div class="social-links">
+          <a href="https://facebook.com" class="social-link" target="_blank">
+            <i class="bi bi-facebook"></i>
+          </a>
+          <a href="https://twitter.com" class="social-link" target="_blank">
+            <i class="bi bi-whatsapp"></i>
+          </a>
+          <a href="https://instagram.com" class="social-link" target="_blank">
+            <i class="bi bi-instagram"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; {{ currentYear }} متجر لينه. جميع الحقوق محفوظة.</p>
+    </div>
+  </div>
+</footer>

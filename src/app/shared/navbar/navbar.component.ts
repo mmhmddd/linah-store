@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 })
 export class NavbarComponent {
   isLoggedIn: boolean = false;
-  brandText: string = ' لينه ';
+  brandText: string = ''; // No longer used directly, handled in HTML
   mainMenu = [
     { link: '/', text: 'الرئيسية', icon: 'bi-house-fill' },
     { link: '/about', text: 'من نحن', icon: 'bi-info-circle-fill' },
