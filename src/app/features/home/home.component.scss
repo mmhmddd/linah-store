@@ -817,14 +817,17 @@ $gradient-magical: linear-gradient(135deg, $bright-orange, $happy-pink, $fun-pur
 
     &.prev {
       right: 5px;
+      padding: 12px;
     }
 
     &.next {
       left: 5px;
+      padding: 12px;
+
     }
 
     .nav-icon {
-      font-size: 0.8rem;
+      font-size: 1.3rem;
     }
   }
 
