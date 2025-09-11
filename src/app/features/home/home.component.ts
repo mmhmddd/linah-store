@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import Swiper from 'swiper';
 import { Navigation, Pagination } from 'swiper/modules';
@@ -6,15 +7,24 @@ import { Navigation, Pagination } from 'swiper/modules';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, ReactiveFormsModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit, OnDestroy {
+  contactForm: FormGroup;
   private heroSlideInterval: any;
   private bookSlideshowIntervals: any[] = [];
   private observer: IntersectionObserver | null = null;
   private swiper: Swiper | null = null;
+
+  constructor(private fb: FormBuilder) {
+    this.contactForm = this.fb.group({
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      message: ['', Validators.required]
+    });
+  }
 
   ngOnInit(): void {
     this.startHeroSlider();
@@ -52,8 +62,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       modules: [Navigation, Pagination],
       direction: 'horizontal',
       loop: true,
-      slidesPerView: 3, // Show 3 cards at a time
-      slidesPerGroup: 1, // Slide 1 card at a time
+      slidesPerView: 3,
+      slidesPerGroup: 1,
       spaceBetween: 20,
       navigation: {
         nextEl: '.slider-nav.next',
@@ -140,5 +150,26 @@ export class HomeComponent implements OnInit, OnDestroy {
       };
       requestAnimationFrame(updateCounter);
     });
+  }
+
+  onSubmit(): void {
+    if (this.contactForm.valid) {
+      console.log('Form Submitted:', this.contactForm.value);
+      // Replace with actual API call to submit form data
+      alert('تم إرسال الرسالة بنجاح!');
+      this.contactForm.reset();
+    }
+  }
+
+  addToCart(bookTitle: string): void {
+    console.log(`Added to cart: ${bookTitle}`);
+    // Replace with actual cart service logic
+    alert(`تم إضافة "${bookTitle}" إلى السلة`);
+  }
+
+  addToFavorites(bookTitle: string): void {
+    console.log(`Added to favorites: ${bookTitle}`);
+    // Replace with actual favorites service logic
+    alert(`تم إضافة "${bookTitle}" إلى المفضلة`);
   }
 }

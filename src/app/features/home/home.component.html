@@ -1,6 +1,6 @@
-<!-- home.component.html -->
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800&family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
 
 <section class="hero-section" dir="rtl" lang="ar">
   <div class="hero-slider">
@@ -183,11 +183,11 @@
                 <span class="price-badge">عرض خاص</span>
               </div>
               <div class="book-actions">
-                <button class="action-button cart-button" aria-label="أضف إلى السلة">
+                <button class="action-button cart-button" aria-label="أضف إلى السلة" (click)="addToCart('مغامرات في الغابة السحرية')">
                   <i class="fas fa-cart-plus"></i>
                   <span class="button-tooltip">أضف للسلة</span>
                 </button>
-                <button class="action-button favorite-button" aria-label="أضف إلى المفضلة">
+                <button class="action-button favorite-button" aria-label="أضف إلى المفضلة" (click)="addToFavorites('مغامرات في الغابة السحرية')">
                   <i class="fas fa-heart"></i>
                   <span class="button-tooltip">المفضلة</span>
                 </button>
@@ -216,11 +216,11 @@
                 <span class="price-badge">الأكثر مبيعًا</span>
               </div>
               <div class="book-actions">
-                <button class="action-button cart-button" aria-label="أضف إلى السلة">
+                <button class="action-button cart-button" aria-label="أضف إلى السلة" (click)="addToCart('أسرار البحر الأزرق')">
                   <i class="fas fa-cart-plus"></i>
                   <span class="button-tooltip">أضف للسلة</span>
                 </button>
-                <button class="action-button favorite-button" aria-label="أضف إلى المفضلة">
+                <button class="action-button favorite-button" aria-label="أضف إلى المفضلة" (click)="addToFavorites('أسرار البحر الأزرق')">
                   <i class="fas fa-heart"></i>
                   <span class="button-tooltip">المفضلة</span>
                 </button>
@@ -249,11 +249,11 @@
                 <span class="price-badge">جديد</span>
               </div>
               <div class="book-actions">
-                <button class="action-button cart-button" aria-label="أضف إلى السلة">
+                <button class="action-button cart-button" aria-label="أضف إلى السلة" (click)="addToCart('رحلة عبر الزمن')">
                   <i class="fas fa-cart-plus"></i>
                   <span class="button-tooltip">أضف للسلة</span>
                 </button>
-                <button class="action-button favorite-button" aria-label="أضف إلى المفضلة">
+                <button class="action-button favorite-button" aria-label="أضف إلى المفضلة" (click)="addToFavorites('رحلة عبر الزمن')">
                   <i class="fas fa-heart"></i>
                   <span class="button-tooltip">المفضلة</span>
                 </button>
@@ -282,11 +282,11 @@
                 <span class="price-badge">مفضل الأطفال</span>
               </div>
               <div class="book-actions">
-                <button class="action-button cart-button" aria-label="أضف إلى السلة">
+                <button class="action-button cart-button" aria-label="أضف إلى السلة" (click)="addToCart('حكايات الجدة الحكيمة')">
                   <i class="fas fa-cart-plus"></i>
                   <span class="button-tooltip">أضف للسلة</span>
                 </button>
-                <button class="action-button favorite-button" aria-label="أضف إلى المفضلة">
+                <button class="action-button favorite-button" aria-label="أضف إلى المفضلة" (click)="addToFavorites('حكايات الجدة الحكيمة')">
                   <i class="fas fa-heart"></i>
                   <span class="button-tooltip">المفضلة</span>
                 </button>
@@ -302,6 +302,89 @@
         <span class="nav-icon">▶️</span>
       </button>
       <div class="swiper-pagination"></div>
+    </div>
+  </div>
+</section>
+
+<section class="contact-section" dir="rtl" lang="ar">
+  <div class="container">
+    <div class="section-header">
+      <h1 class="section-title">
+        <span class="title-decoration">📧</span>
+        تواصلوا معنا
+        <span class="title-decoration">📧</span>
+      </h1>
+      <p class="section-description">يسعدنا سماع آرائكم واستفساراتكم! تواصلوا معنا الآن</p>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-form-card" data-aos="fade-up" data-aos-delay="100">
+        <h2 class="form-title">أرسل رسالتك</h2>
+        <form class="contact-form" [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label for="name">الاسم</label>
+            <input type="text" id="name" formControlName="name" placeholder="أدخل اسمك" required>
+            <div *ngIf="contactForm.get('name')?.invalid && contactForm.get('name')?.touched" class="error-message">
+              الاسم مطلوب
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="email">البريد الإلكتروني</label>
+            <input type="email" id="email" formControlName="email" placeholder="أدخل بريدك الإلكتروني" required>
+            <div *ngIf="contactForm.get('email')?.invalid && contactForm.get('email')?.touched" class="error-message">
+              البريد الإلكتروني غير صالح
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="message">رسالتك</label>
+            <textarea id="message" formControlName="message" placeholder="اكتب رسالتك هنا" rows="5" required></textarea>
+            <div *ngIf="contactForm.get('message')?.invalid && contactForm.get('message')?.touched" class="error-message">
+              الرسالة مطلوبة
+            </div>
+          </div>
+          <button type="submit" class="form-submit-button" [disabled]="contactForm.invalid">
+            <span class="button-text">إرسال</span>
+            <span class="button-icon">✉️</span>
+          </button>
+        </form>
+      </div>
+      <div class="contact-details-card" data-aos="fade-up" data-aos-delay="200">
+        <h2 class="details-title">معلومات التواصل</h2>
+        <div class="contact-info">
+          <div class="info-item">
+            <i class="fas fa-envelope"></i>
+            <span>linahstore1&#64;gmail.com</span>
+          </div>
+          <div class="info-item">
+            <i class="fas fa-phone"></i>
+            <span>01115000562</span>
+          </div>
+          <div class="info-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>123 شارع المغامرة، القاهرة، مصر</span>
+          </div>
+        </div>
+        <div class="map-container">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.123456789!2d31.23571161520988!3d30.04441998187695!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDAyJzQwLjciTiAzMcKwMTQnMDguNiJF!5e0!3m2!1sar!2seg!4v1634567890123"
+            width="100%"
+            height="200"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy">
+          </iframe>
+        </div>
+        <div class="social-icons">
+          <a href="https://www.facebook.com/LinahBookStore/?locale=ar_AR" target="_blank" class="social-icon" aria-label="فيسبوك">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="https://l.facebook.com/l.php?u=https%3A%2F%2Fwww.instagram.com%2Flinahbookstore%3Ffbclid%3DIwZXh0bgNhZW0CMTAAYnJpZBExRkdNVmdtTW12YXJhV1FWeAEecQkj_YoEDJ8TbOnqn4tpX_aT53LTiRsM-ve8BODAkn7lXrsni3xmfFQeEYY_aem_xG4l8tzGTCr11kCA6cwEkQ&h=AT2itsHiSUpAMkKaEmq9sQo3GNQGKg8Ax0hIgO6wmOdu1j2SAUHkoU5Va_qLL7ClyZ0yeOfkqCJCa3Qm6MG5d4sRxwVvBVrk0TPx9vVvHKBFWEVpIIFqNRsTeqWCLfgccHlwpw" target="_blank" class="social-icon" aria-label="إنستغرام">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="https://wa.me/+201115000562" target="_blank" class="social-icon" aria-label="واتساب">
+            <i class="fab fa-whatsapp"></i>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </section>
