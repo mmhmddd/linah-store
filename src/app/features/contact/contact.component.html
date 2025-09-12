@@ -1,1 +1,213 @@
-<p>contact works!</p>
+<div class="contact-page" dir="rtl" lang="ar">
+  <!-- Hero Section with Google Map -->
+  <section class="contact-hero">
+    <a href="https://www.google.com/maps/place/30.0444,31.2357" target="_blank" class="map-link">
+      <div class="map-container">
+        <iframe
+          class="google-map"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3453.897!2d31.235711615!3d30.044419981!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzDCsDAyJzQwLjciTiAzMcKwMTQnMDguNiJF!5e0!3m2!1sen!2sus!4v1631234567890"
+          allowfullscreen=""
+          loading="lazy">
+        </iframe>
+      </div>
+    </a>
+  </section>
+
+  <!-- Contact Details Section -->
+  <section class="contact-details">
+    <div class="container">
+      <div class="section-header">
+        <h3 class="section-title">تفاصيل التواصل</h3>
+        <div class="title-underline"></div>
+        <p class="section-description">تواصلوا معنا بسهولة من خلال المعلومات التالية</p>
+      </div>
+      <div class="details-grid">
+        <div class="detail-card">
+          <i class="bi bi-envelope-fill detail-icon"></i>
+          <h4 class="detail-title">البريد الإلكتروني</h4>
+          <p class="detail-description">
+            <a href="mailto:info@bookstore.com" class="detail-link">linahstore1&#64;gmail.com</a>
+          </p>
+        </div>
+        <div class="detail-card">
+          <i class="bi bi-telephone-fill detail-icon"></i>
+          <h4 class="detail-title">رقم الهاتف</h4>
+          <p class="detail-description">
+          <a href="tel:+201115000562" class="detail-link" dir="ltr">+20 11 15000562</a>
+          </p>
+        </div>
+        <div class="detail-card">
+          <i class="bi bi-geo-alt-fill detail-icon"></i>
+          <h4 class="detail-title">العنوان</h4>
+          <p class="detail-description">
+            <a href="https://www.google.com/maps/place/30.0444,31.2357" target="_blank" class="detail-link">
+              123 شارع الكتب، القاهرة، مصر
+            </a>
+          </p>
+        </div>
+        <div class="detail-card">
+          <i class="bi bi-clock-fill detail-icon"></i>
+          <h4 class="detail-title">ساعات العمل</h4>
+          <p class="detail-description">الأحد - الخميس: 9 صباحًا - 5 مساءً<br>الجمعة والسبت: مغلق</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Form Section -->
+  <section class="contact-form-section">
+    <div class="container">
+      <div class="section-header">
+        <h3 class="section-title">نموذج التواصل</h3>
+        <div class="title-underline"></div>
+        <p class="section-description">أرسل رسالتك وسنجيب في أقرب وقت ممكن</p>
+      </div>
+      <form class="contact-form" #contactForm="ngForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="name">الاسم <span class="required">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                #name="ngModel"
+                [(ngModel)]="formData.name"
+                required
+                class="form-control"
+                placeholder="أدخل اسمك"
+              />
+            </div>
+            <div *ngIf="name.invalid && (name.dirty || name.touched)" class="invalid-feedback">
+              الاسم مطلوب.
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="subject">الموضوع <span class="required">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-chat-dots-fill"></i></span>
+              <input
+                type="text"
+                id="subject"
+                name="subject"
+                #subject="ngModel"
+                [(ngModel)]="formData.subject"
+                required
+                class="form-control"
+                placeholder="أدخل موضوع رسالتك"
+              />
+            </div>
+            <div *ngIf="subject.invalid && (subject.dirty || subject.touched)" class="invalid-feedback">
+              الموضوع مطلوب.
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="email">البريد الإلكتروني</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                #email="ngModel"
+                [(ngModel)]="formData.email"
+                class="form-control"
+                placeholder="أدخل بريدك الإلكتروني"
+              />
+            </div>
+            <div *ngIf="email.invalid && (email.dirty || email.touched)" class="invalid-feedback">
+              البريد الإلكتروني غير صالح.
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="phone">رقم الهاتف <span class="required">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                #phone="ngModel"
+                [(ngModel)]="formData.phone"
+                required
+                class="form-control"
+                placeholder="أدخل رقم هاتفك"
+              />
+            </div>
+            <div *ngIf="phone.invalid && (phone.dirty || phone.touched)" class="invalid-feedback">
+              رقم الهاتف مطلوب.
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label for="message">الرسالة <span class="required">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-chat-text-fill"></i></span>
+              <textarea
+                id="message"
+                name="message"
+                #message="ngModel"
+                [(ngModel)]="formData.message"
+                required
+                class="form-control"
+                placeholder="اكتب رسالتك هنا"
+                rows="5"
+              ></textarea>
+            </div>
+            <div *ngIf="message.invalid && (message.dirty || message.touched)" class="invalid-feedback">
+              الرسالة مطلوبة.
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="submit-btn" [disabled]="!contactForm.valid">إرسال الرسالة</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section">
+    <div class="container">
+      <div class="section-header">
+        <h3 class="section-title">الأسئلة الشائعة</h3>
+        <div class="title-underline"></div>
+        <p class="section-description">إجابات على أكثر الأسئلة شيوعاً</p>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item" *ngFor="let faq of faqs; let i = index">
+          <div class="faq-question" (click)="toggleFaq(i)" [class.active]="faq.isOpen">
+            <h4>{{ faq.question }}</h4>
+            <span class="faq-toggle">{{ faq.isOpen ? '−' : '+' }}</span>
+          </div>
+          <div class="faq-answer" [class.open]="faq.isOpen">
+            <p>{{ faq.answer }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Social Icons Section -->
+  <section class="social-icons">
+    <div class="container">
+      <div class="section-header">
+        <h3 class="section-title">تابعنا على وسائل التواصل</h3>
+        <div class="title-underline"></div>
+        <p class="section-description">ابق على اتصال معنا عبر منصاتنا الاجتماعية</p>
+      </div>
+      <div class="social-links">
+        <a href="https://www.facebook.com/share/g/1Ax7bwGL6E/?mibextid=wwXIfr" target="_blank" title="Facebook" class="social-link facebook">
+          <i class="bi bi-facebook"></i>
+        </a>
+        <a href="https://x.com/QatrahGhaith" target="_blank" title="X" class="social-link x">
+          <i class="bi bi-twitter"></i>
+        </a>
+        <a href="https://www.instagram.com/qatrah_ghaith?igsh=OGNvNDU1MGxpMWNs" target="_blank" title="Instagram" class="social-link instagram">
+          <i class="bi bi-instagram"></i>
+        </a>
+        <a href="https://www.linkedin.com/company/qatrah-ghaith/" target="_blank" title="LinkedIn" class="social-link linkedin">
+          <i class="bi bi-linkedin"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+</div>
