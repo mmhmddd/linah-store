@@ -1,0 +1,507 @@
+/* Color Variables */
+$primary-bg: #26735D;
+$primary-brand: #26735D;
+$accent-yellow: #FFD700;
+$text-dark: #2C3E50;
+$white: #FFFFFF;
+$shadow-light: rgba(0, 0, 0, 0.1);
+$shadow-medium: rgba(0, 0, 0, 0.15);
+$whatsapp-green: #25D366;
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hoverLift {
+  to { transform: translateY(-5px); box-shadow: 0 10px 20px $shadow-light; }
+}
+
+/* About Section */
+.about-section {
+  background: $white;
+  color: $text-dark;
+  font-family: 'Tajawal', sans-serif;
+  min-height: 100vh;
+  direction: rtl;
+}
+
+/* Hero Section */
+.hero-image {
+  width: 100%;
+  height: 75vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* Content Row */
+.content-row {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+@media (max-width: 991.98px) {
+  .content-row {
+    flex-direction: column;
+    padding: 1.5rem 0;
+  }
+}
+
+/* Text Column */
+.text-column {
+  flex: 2;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: $text-dark;
+}
+
+.title-underline {
+  width: 100px;
+  height: 4px;
+  background: $accent-yellow;
+  margin: 0.5rem auto;
+  border-radius: 2px;
+}
+
+.section-content {
+  background: $white;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px $shadow-light;
+  transition: all 0.3s ease;
+}
+
+.section-content:hover {
+  animation: hoverLift 0.3s forwards;
+}
+
+.section-description {
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: $text-dark;
+  margin-bottom: 1.5rem;
+  text-align: justify;
+}
+
+/* Features Grid */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.feature-card {
+  background: rgba($primary-brand, 0.05);
+  padding: 1.5rem;
+  border-radius: 10px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  animation: hoverLift 0.3s forwards;
+}
+
+.feature-icon {
+  font-size: 2.5rem;
+  color: $primary-brand;
+  margin-bottom: 1rem;
+}
+
+.feature-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: $text-dark;
+}
+
+.feature-description {
+  font-size: 1rem;
+  color: $text-dark;
+  opacity: 0.8;
+}
+
+/* Info Column */
+.info-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.logo-container {
+  background: $white;
+  padding: 2rem;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 5px 15px $shadow-light;
+  transition: all 0.3s ease;
+}
+
+.logo-container:hover {
+  animation: hoverLift 0.3s forwards;
+}
+
+.logo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo-placeholder i {
+  font-size: 3rem;
+  color: $primary-brand;
+}
+
+.logo-placeholder h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: $text-dark;
+}
+
+.achievements-container {
+  background: rgba($primary-brand, 0.05);
+  padding: 2rem;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 5px 15px $shadow-light;
+  transition: all 0.3s ease;
+}
+
+.achievements-container:hover {
+  animation: hoverLift 0.3s forwards;
+}
+
+.achievements-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: $text-dark;
+  margin-bottom: 1.5rem;
+}
+
+.achievements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.achievement-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.1rem;
+  color: $text-dark;
+}
+
+.achievement-item i {
+  font-size: 1.5rem;
+  color: $primary-brand;
+}
+
+/* Vision Mission Section */
+.vision-mission-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin: 3rem 0;
+}
+
+.vision-card, .mission-card {
+  background: $white;
+  padding: 2rem;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 5px 15px $shadow-light;
+  transition: all 0.3s ease;
+}
+
+.vision-card:hover, .mission-card:hover {
+  animation: hoverLift 0.3s forwards;
+}
+
+.card-icon {
+  font-size: 2.5rem;
+  color: $primary-brand;
+  margin-bottom: 1rem;
+}
+
+.card-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: $text-dark;
+  margin-bottom: 1rem;
+}
+
+.card-description {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: $text-dark;
+  opacity: 0.9;
+  text-align: justify;
+}
+
+/* Values Section */
+.values-section {
+  margin: 3rem 0;
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+}
+
+.value-card {
+  background: $white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 5px 15px $shadow-light;
+  transition: all 0.3s ease;
+}
+
+.value-card:hover {
+  animation: hoverLift 0.3s forwards;
+}
+
+.value-icon {
+  font-size: 2rem;
+  color: $primary-brand;
+  margin-bottom: 1rem;
+}
+
+.value-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $text-dark;
+  margin-bottom: 0.5rem;
+}
+
+.value-description {
+  font-size: 1rem;
+  color: $text-dark;
+  opacity: 0.8;
+}
+
+/* Why Choose Us Section */
+.why-choose-section {
+  margin: 3rem 0;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+}
+
+.benefit-card {
+  background: rgba($primary-brand, 0.05);
+  padding: 1.5rem;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 5px 15px $shadow-light;
+  transition: all 0.3s ease;
+}
+
+.benefit-card:hover {
+  animation: hoverLift 0.3s forwards;
+}
+
+.benefit-icon {
+  font-size: 2rem;
+  color: $primary-brand;
+  margin-bottom: 1rem;
+}
+
+.benefit-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: $text-dark;
+  margin-bottom: 0.5rem;
+}
+
+.benefit-description {
+  font-size: 1rem;
+  color: $text-dark;
+  opacity: 0.8;
+}
+
+/* CTA Section */
+.cta-section {
+  text-align: center;
+}
+
+.cta-content {
+  background: $primary-bg;
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.cta-content:hover {
+  animation: hoverLift 0.3s forwards;
+}
+
+.cta-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.cta-description {
+  font-size: 1.2rem;
+  color: white;
+  opacity: 0.9;
+  margin-bottom: 2rem;
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: $whatsapp-green;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  color: $white;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.cta-button:hover {
+  background: darken($whatsapp-green, 10%);
+  animation: hoverLift 0.3s forwards;
+}
+
+.cta-button i {
+  font-size: 1.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 991.98px) {
+  .hero-image {
+    height: 50vh;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .section-description {
+    font-size: 1.1rem;
+  }
+
+  .features-grid, .values-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .benefits-grid {
+    grid-template-columns: repeat(2, 2fr);
+  }
+
+  .vision-mission-section {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-title {
+    font-size: 1.8rem;
+  }
+
+  .cta-description {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .hero-image {
+    height: 40vh;
+  }
+
+  .section-title {
+    font-size: 1.8rem;
+  }
+
+  .section-content {
+    padding: 1.5rem;
+  }
+
+  .section-description {
+    font-size: 1rem;
+  }
+
+  .feature-icon, .card-icon, .value-icon, .benefit-icon {
+    font-size: 1.8rem;
+  }
+
+  .feature-title, .card-title, .value-title, .benefit-title {
+    font-size: 1.2rem;
+  }
+
+  .feature-description, .card-description, .value-description, .benefit-description {
+    font-size: 0.9rem;
+  }
+
+  .logo-placeholder i {
+    font-size: 2.5rem;
+  }
+
+  .logo-placeholder h3 {
+    font-size: 1.5rem;
+  }
+
+  .achievements-title {
+    font-size: 1.5rem;
+  }
+
+  .achievement-item {
+    font-size: 1rem;
+  }
+
+  .achievement-item i {
+    font-size: 1.2rem;
+  }
+
+  .cta-title {
+    font-size: 1.5rem;
+  }
+
+  .cta-description {
+    font-size: 1rem;
+  }
+
+  .cta-button {
+    font-size: 1rem;
+    padding: 0.8rem 1.5rem;
+  }
+
+  .cta-button i {
+    font-size: 1.2rem;
+  }
+
+
+}
