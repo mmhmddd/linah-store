@@ -11,7 +11,6 @@ import { CommonModule } from '@angular/common';
 })
 export class NavbarComponent {
   isLoggedIn: boolean = false;
-  brandText: string = ''; // No longer used directly, handled in HTML
   mainMenu = [
     { link: '/', text: 'الرئيسية', icon: 'bi-house-fill' },
     { link: '/about', text: 'من نحن', icon: 'bi-info-circle-fill' },
@@ -33,10 +32,11 @@ export class NavbarComponent {
 
   toggleMobileMenu() {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    console.log('Mobile menu toggled:', this.isMobileMenuOpen); // Debugging
   }
 
   logout() {
     this.isLoggedIn = false;
-    // Add logout logic here
+    // Add logout logic here (e.g., clear auth token, redirect)
   }
 }

@@ -1,1 +1,148 @@
-<p>cart works!</p>
+
+<div class="cart-container" dir="rtl">
+  <!-- Step 1: Cart View -->
+  <div *ngIf="step === 1" class="cart-step">
+    <div class="row">
+      <!-- Cart Items: 64% width, aligned to the left -->
+      <div class="cart-items-wrapper">
+        <h2 class="cart-title">سلة التسوق</h2>
+        <button *ngIf="step === 1" class="action-button navigate-button" (click)="scrollToOrderSummary()" aria-label="الذهاب لتأكيد الطلب">
+          الذهاب لتأكيد الطلب
+        </button>
+        <div class="cart-items">
+          <div *ngFor="let item of cartItems" class="book-card">
+            <div class="book-rating">
+              <span class="star" *ngFor="let _ of [].constructor(item.rating)">⭐</span>
+            </div>
+            <div class="book-card-slideshow">
+              <div class="book-slide active" [style.backgroundImage]="'url(' + item.image + ')'"></div>
+            </div>
+            <div class="book-content">
+              <div class="book-category-badge">🌳 {{item.category}}</div>
+              <h2 class="book-title">{{item.title}}</h2>
+              <p class="book-description">{{item.description}}</p>
+              <div class="book-price-container">
+                <span class="book-price">{{item.price * item.quantity | number:'1.2-2'}} ج.م</span>
+                <span class="price-badge">عرض خاص</span>
+              </div>
+              <div class="book-actions">
+                <div class="quantity-control">
+                  <button class="quantity-button" (click)="updateQuantity(item, -1)" aria-label="تقليل الكمية">-</button>
+                  <span class="quantity">{{item.quantity}}</span>
+                  <button class="quantity-button" (click)="updateQuantity(item, 1)" aria-label="زيادة الكمية">+</button>
+                </div>
+                <button class="action-button remove-button" (click)="removeFromCart(item.id)" aria-label="إزالة من السلة">
+                  <i class="fas fa-trash"></i>
+                  <span class="button-tooltip">إزالة</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Order Summary: fixed to the right -->
+      <div class="order-summary-wrapper" id="order-summary">
+        <div class="order-summary">
+          <h3 class="summary-title">ملخص الطلب</h3>
+          <div class="summary-content">
+            <div class="coupon-section">
+              <input type="text" [(ngModel)]="couponCode" placeholder="كوبون الخصم" class="coupon-input" aria-label="إدخال كوبون الخصم">
+              <button class="action-button apply-coupon" (click)="applyCoupon()">تأكيد</button>
+            </div>
+            <div class="summary-details">
+              <div class="summary-row">
+                <span>المبلغ</span>
+                <span>{{getSubtotal() | number:'1.2-2'}} ج.م</span>
+              </div>
+              <div class="summary-row" *ngIf="discount > 0">
+                <span>الخصم</span>
+                <span>-{{discount | number:'1.2-2'}} ج.م</span>
+              </div>
+              <div class="summary-row total">
+                <span>المبلغ الكلي</span>
+                <span>{{getTotalPrice() | number:'1.2-2'}} ج.م</span>
+              </div>
+            </div>
+            <button class="action-button proceed-button" (click)="nextStep()" [disabled]="cartItems.length === 0" aria-label="تأكيد الطلب">
+              تأكيد الطلب
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Shipping and Order Confirmation -->
+  <div *ngIf="step === 2" class="cart-step">
+    <div class="row">
+      <!-- Cart Items: 64% width, aligned to the left -->
+      <div class="cart-items-wrapper">
+        <h2 class="cart-title">عناصر السلة</h2>
+        <div class="cart-items">
+          <div *ngFor="let item of cartItems" class="book-card">
+            <div class="book-rating">
+              <span class="star" *ngFor="let _ of [].constructor(item.rating)">⭐</span>
+            </div>
+            <div class="book-card-slideshow">
+              <div class="book-slide active" [style.backgroundImage]="'url(' + item.image + ')'"></div>
+            </div>
+            <div class="book-content">
+              <div class="book-category-badge">🌳 {{item.category}}</div>
+              <h2 class="book-title">{{item.title}}</h2>
+              <p class="book-description">{{item.description}}</p>
+              <div class="book-price-container">
+                <span class="book-price">{{item.price * item.quantity | number:'1.2-2'}} ج.م</span>
+                <span class="price-badge">عرض خاص</span>
+              </div>
+              <div class="book-actions">
+                <div class="quantity-control">
+                  <button class="quantity-button" (click)="updateQuantity(item, -1)" aria-label="تقليل الكمية">-</button>
+                  <span class="quantity">{{item.quantity}}</span>
+                  <button class="quantity-button" (click)="updateQuantity(item, 1)" aria-label="زيادة الكمية">+</button>
+                </div>
+                <button class="action-button remove-button" (click)="removeFromCart(item.id)" aria-label="إزالة من السلة">
+                  <i class="fas fa-trash"></i>
+                  <span class="button-tooltip">إزالة</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Shipping Form and Order Details: fixed to the right -->
+      <div class="order-summary-wrapper" id="order-summary">
+        <div class="order-summary">
+          <h3 class="summary-title">تفاصيل الطلب</h3>
+          <div class="summary-content">
+            <form class="shipping-form">
+              <select [(ngModel)]="shippingInfo.governorate" name="governorate" required aria-label="اختيار المحافظة">
+                <option value="" disabled selected>اختر المحافظة</option>
+                <option *ngFor="let governorate of governorates" [value]="governorate">{{governorate}}</option>
+              </select>
+              <input type="text" [(ngModel)]="shippingInfo.name" name="name" placeholder="الاسم الكامل" required aria-label="الاسم الكامل">
+              <input type="text" [(ngModel)]="shippingInfo.address" name="address" placeholder="العنوان" required aria-label="العنوان">
+              <textarea [(ngModel)]="shippingInfo.notes" name="notes" placeholder="الملاحظات (اختياري)" aria-label="الملاحظات"></textarea>
+              <div class="payment-method">
+                <label>طريقة الدفع</label>
+                <div class="payment-option">كاش عند الاستلام</div>
+              </div>
+              <div class="order-details-summary">
+                <h4>ملخص التفاصيل</h4>
+                <p *ngIf="shippingInfo.governorate"><strong>المحافظة:</strong> {{shippingInfo.governorate}}</p>
+                <p *ngIf="shippingInfo.name"><strong>الاسم:</strong> {{shippingInfo.name}}</p>
+                <p *ngIf="shippingInfo.address"><strong>العنوان:</strong> {{shippingInfo.address}}</p>
+                <p *ngIf="shippingInfo.notes"><strong>الملاحظات:</strong> {{shippingInfo.notes}}</p>
+                <p><strong>طريقة الدفع:</strong> كاش عند الاستلام</p>
+                <p><strong>المبلغ الكلي:</strong> {{getTotalPrice() | number:'1.2-2'}} ج.م</p>
+              </div>
+              <div class="form-actions">
+                <button type="button" class="action-button" (click)="prevStep()" aria-label="رجوع">رجوع</button>
+                <button type="button" class="action-button" (click)="submitShipping()" [disabled]="!shippingInfo.governorate || !shippingInfo.name || !shippingInfo.address" aria-label="تأكيد الطلب">تأكيد الطلب</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

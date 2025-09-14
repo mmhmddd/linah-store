@@ -1,1 +1,79 @@
-<p>favourite works!</p>
+<div class="favourite-container" dir="rtl" role="region" aria-label="قائمة المفضلة">
+  <header class="favourite-header">
+    <h2 class="favourite-title">المفضلة</h2>
+    <button *ngIf="favouriteItems.length > 0" class="action-button clear-favourites" (click)="openClearModal()" aria-label="مسح جميع المفضلة" type="button">
+      مسح الكل
+    </button>
+  </header>
+
+  <!-- Favorites List -->
+  <div *ngIf="favouriteItems.length > 0; else emptyState" class="favourite-items">
+    <div *ngFor="let item of favouriteItems; trackBy: trackById" class="book-card" role="article" [attr.aria-labelledby]="'book-title-' + item.id">
+      <div class="book-card-image" [style.backgroundImage]="'url(' + item.image + ')'" [attr.aria-label]="'صورة الكتاب: ' + item.title">
+        <div class="book-rating" [attr.aria-label]="'التقييم: ' + item.rating + ' نجوم'">
+          <span class="star" *ngFor="let _ of [].constructor(item.rating)" aria-hidden="true">⭐</span>
+        </div>
+      </div>
+      <div class="book-content">
+        <div class="book-category-badge">{{item.category}}</div>
+        <h3 class="book-title" [id]="'book-title-' + item.id">{{item.title}}</h3>
+        <p class="book-description">{{item.description}}</p>
+        <div class="book-footer">
+          <div class="book-price-container">
+            <span class="book-price">{{item.price | number:'1.2-2'}} ج.م</span>
+          </div>
+          <div class="button-group">
+            <button
+              class="action-button favourite-button"
+              [ngClass]="{'active': isFavourite(item)}"
+              (click)="toggleFavourite(item)"
+              [attr.aria-label]="isFavourite(item) ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة'"
+              type="button">
+              <i class="fas fa-heart" aria-hidden="true"></i>
+              <span class="button-tooltip">{{isFavourite(item) ? 'إزالة' : 'إضافة'}}</span>
+            </button>
+            <button
+              class="action-button cart-button"
+              [ngClass]="{'active': isInCart(item)}"
+              (click)="toggleCart(item)"
+              [attr.aria-label]="isInCart(item) ? 'إزالة من السلة' : 'إضافة إلى السلة'"
+              type="button">
+              <i class="fas fa-shopping-cart" aria-hidden="true"></i>
+              <span class="button-tooltip">{{isInCart(item) ? 'إزالة من السلة' : 'إضافة إلى السلة'}}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <ng-template #emptyState>
+    <div class="empty-state" role="alert">
+      <div class="empty-state-content">
+        <i class="fas fa-heart-broken empty-icon" aria-hidden="true"></i>
+        <h3 class="empty-title">قائمة المفضلة فارغة</h3>
+        <p class="empty-description">لم تقم بإضافة أي كتب بعد. تصفح مجموعتنا وأضف كتبك المفضلة!</p>
+        <button class="action-button explore-button" (click)="exploreBooks()" aria-label="استكشاف الكتب" type="button">
+          استكشاف الآن
+        </button>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Clear Favorites Modal -->
+  <div *ngIf="showClearModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <h3 class="modal-title" id="modal-title">تأكيد المسح</h3>
+      <p class="modal-description">هل تريد مسح جميع الكتب من المفضلة؟</p>
+      <div class="modal-actions">
+        <button class="action-button cancel-button" (click)="closeClearModal()" aria-label="إلغاء" type="button">
+          إلغاء
+        </button>
+        <button class="action-button confirm-button" (click)="clearFavourites()" aria-label="تأكيد" type="button">
+          تأكيد
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

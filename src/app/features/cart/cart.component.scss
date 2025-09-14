@@ -1,0 +1,677 @@
+$white: #ffffff;
+$shadow-medium: rgba(0, 0, 0, 0.1);
+$shadow-dark: rgba(0, 0, 0, 0.2);
+$accent-yellow: #f4b400;
+$primary-brand: #2c3e50;
+$text-dark: #333333;
+$grass-green: #27ae60;
+$bright-orange: #e67e22;
+$happy-pink: #e84393;
+
+// Breakpoints
+$breakpoint-mobile: 576px;
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 992px;
+
+.cart-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  direction: rtl;
+  min-height: 100vh;
+
+  @media (min-width: $breakpoint-tablet) {
+    padding: 2rem;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+
+    @media (max-width: $breakpoint-desktop) {
+      flex-wrap: wrap;
+    }
+  }
+
+  .cart-items-wrapper {
+    flex: 0 0 64%;
+    max-width: 64%;
+    order: 1;
+
+    @media (max-width: $breakpoint-desktop) {
+      flex: 0 0 100%;
+      max-width: 100%;
+    }
+  }
+
+  .order-summary-wrapper {
+    flex: 0 0 36%;
+    max-width: 36%;
+    order: 2;
+    position: sticky;
+    top: 1rem;
+    height: fit-content;
+
+    @media (max-width: $breakpoint-desktop) {
+      flex: 0 0 100%;
+      max-width: 100%;
+      position: static;
+    }
+  }
+
+  .cart-title {
+    font-size: clamp(1.8rem, 5.5vw, 2.2rem);
+    font-weight: 800;
+    color: $primary-brand;
+    text-align: right;
+    margin-bottom: 2rem;
+    padding-bottom: 0.5rem;
+    position: relative;
+    line-height: 1.4;
+    text-shadow: 0 1px 3px $shadow-medium;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(to left, $accent-yellow, $bright-orange);
+      border-radius: 2px;
+    }
+
+    @media (max-width: $breakpoint-mobile) {
+      font-size: clamp(1.4rem, 4.5vw, 1.6rem);
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  .navigate-button {
+    display: none; /* Hide by default */
+    padding: 0.8rem 1.5rem;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    font-weight: 600;
+    background: $primary-brand;
+    color: $white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+    text-align: center;
+
+    @media (max-width: $breakpoint-desktop) {
+      display: inline-block; /* Show on mobile */
+      width: 100%; /* Full width on mobile */
+    }
+
+    &:hover {
+      background: $bright-orange;
+      transform: scale(1.05);
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba($bright-orange, 0.3);
+    }
+
+    @media (max-width: $breakpoint-mobile) {
+      padding: 0.7rem 1rem;
+    }
+  }
+
+  .cart-items {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    @media (min-width: $breakpoint-tablet) {
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .book-card {
+      background: $white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px $shadow-medium;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      height: auto;
+      min-height: 180px;
+      position: relative;
+
+      @media (max-width: $breakpoint-mobile) {
+        flex-direction: column;
+        min-height: 300px;
+      }
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 18px $shadow-dark;
+
+        .book-card-slideshow {
+          transform: scale(1.03);
+        }
+
+        .book-title {
+          color: $bright-orange;
+        }
+      }
+
+      .book-rating {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        display: flex;
+        gap: 0.2rem;
+        z-index: 2;
+
+        .star {
+          font-size: clamp(0.8rem, 2vw, 0.9rem);
+          color: $accent-yellow;
+        }
+      }
+
+      .book-card-slideshow {
+        width: 150px;
+        height: 200px;
+        position: relative;
+        transition: transform 0.3s ease;
+        flex-shrink: 0;
+
+        @media (max-width: $breakpoint-mobile) {
+          width: 100%;
+          height: 150px;
+        }
+
+        .book-slide {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          background-size: cover;
+          background-position: center;
+          opacity: 0;
+          transition: opacity 0.5s ease-in-out;
+          background-repeat: no-repeat;
+
+          &.active {
+            opacity: 1;
+          }
+
+          @media (max-width: $breakpoint-mobile) {
+            background-size: contain;
+            background-position: center;
+          }
+        }
+      }
+
+      .book-content {
+        padding: 1rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        @media (min-width: $breakpoint-tablet) {
+          padding: 1.2rem;
+        }
+
+        .book-category-badge {
+          background: $grass-green;
+          color: $white;
+          padding: 0.3rem 0.7rem;
+          border-radius: 12px;
+          font-size: clamp(0.65rem, 2vw, 0.75rem);
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+          align-self: flex-end;
+        }
+
+        .book-title {
+          font-size: clamp(1.2rem, 3.5vw, 1.4rem);
+          font-weight: 700;
+          color: $text-dark;
+          margin-bottom: 0.5rem;
+          text-align: right;
+          line-height: 1.3;
+
+          @media (max-width: $breakpoint-mobile) {
+            font-size: clamp(1.1rem, 3vw, 1.2rem);
+          }
+        }
+
+        .book-description {
+          font-size: clamp(0.75rem, 2vw, 0.85rem);
+          color: $text-dark;
+          opacity: 0.7;
+          margin-bottom: 0.5rem;
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          text-align: right;
+        }
+
+        .book-price-container {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 0.5rem;
+          justify-content: flex-end;
+
+          .book-price {
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+            font-weight: 600;
+            color: $bright-orange;
+          }
+
+          .price-badge {
+            background: $happy-pink;
+            color: $white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+            font-size: clamp(0.55rem, 1.5vw, 0.65rem);
+          }
+        }
+
+        .book-actions {
+          display: flex;
+          align-items: center;
+          gap: 0.7rem;
+          flex-shrink: 0;
+          justify-content: flex-end;
+
+          @media (max-width: $breakpoint-mobile) {
+            justify-content: center;
+          }
+
+          .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            .quantity-button {
+              width: 32px;
+              height: 32px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: clamp(0.9rem, 2vw, 1rem);
+              border: 2px solid $accent-yellow;
+              border-radius: 50%;
+              background: $white;
+              color: $primary-brand;
+              transition: all 0.3s ease;
+
+              &:hover {
+                background: $accent-yellow;
+                color: $white;
+              }
+
+              @media (max-width: $breakpoint-mobile) {
+                width: 28px;
+                height: 28px;
+              }
+            }
+
+            .quantity {
+              font-size: clamp(0.9rem, 2vw, 1rem);
+              font-weight: 600;
+              color: $text-dark;
+            }
+          }
+
+          .remove-button {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.2rem, 2.5vw, 1.3rem);
+            border: 2px solid $accent-yellow;
+            border-radius: 50%;
+            background: $white;
+            color: $primary-brand;
+            position: relative;
+            transition: all 0.3s ease;
+
+            &:hover {
+              background: $happy-pink;
+              color: $white;
+              transform: scale(1.1);
+            }
+
+            .fa-trash {
+              font-size: clamp(1rem, 2vw, 1.1rem);
+            }
+
+            @media (max-width: $breakpoint-mobile) {
+              width: 34px;
+              height: 34px;
+              font-size: clamp(1rem, 2vw, 1.1rem);
+
+              .fa-trash {
+                font-size: clamp(0.9rem, 1.8vw, 1rem);
+              }
+            }
+
+            .button-tooltip {
+              position: absolute;
+              bottom: 100%;
+              right: 50%;
+              transform: translateX(50%);
+              background: $text-dark;
+              color: $white;
+              padding: 0.3rem 0.6rem;
+              border-radius: 8px;
+              font-size: clamp(0.55rem, 1.5vw, 0.65rem);
+              opacity: 0;
+              visibility: hidden;
+              transition: all 0.3s ease;
+              white-space: nowrap;
+
+              &:after {
+                content: '';
+                position: absolute;
+                top: 100%;
+                right: 50%;
+                transform: translateX(50%);
+                border: 4px solid transparent;
+                border-top-color: $text-dark;
+              }
+            }
+
+            &:hover .button-tooltip {
+              opacity: 1;
+              visibility: visible;
+              transform: translateX(50%) translateY(-5px);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .order-summary {
+    background: $white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px $shadow-medium;
+
+    @media (min-width: $breakpoint-tablet) {
+      padding: 2rem;
+    }
+
+    .summary-title {
+      font-size: clamp(1.5rem, 4vw, 1.8rem);
+      font-weight: 800;
+      color: $primary-brand;
+      margin-bottom: 1.5rem;
+      text-align: right;
+      padding-bottom: 0.5rem;
+      position: relative;
+      line-height: 1.4;
+      text-shadow: 0 1px 3px $shadow-medium;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 50px;
+        height: 4px;
+        background: linear-gradient(to left, $accent-yellow, $bright-orange);
+        border-radius: 2px;
+      }
+
+      @media (max-width: $breakpoint-mobile) {
+        font-size: clamp(1.2rem, 3vw, 1.4rem);
+        margin-bottom: 1rem;
+      }
+    }
+
+    .summary-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      .coupon-section {
+        display: flex;
+        gap: 0.5rem;
+
+        .coupon-input {
+          flex: 1;
+          padding: 0.7rem;
+          border: 2px solid $accent-yellow;
+          border-radius: 8px;
+          font-size: clamp(0.9rem, 2vw, 1rem);
+          color: $text-dark;
+          text-align: right;
+
+          &:focus {
+            outline: none;
+            border-color: $primary-brand;
+          }
+
+          @media (max-width: $breakpoint-mobile) {
+            padding: 0.6rem;
+          }
+        }
+
+        .apply-coupon {
+          padding: 0.7rem 1rem;
+          font-size: clamp(0.9rem, 2vw, 1rem);
+          font-weight: 600;
+          background: $primary-brand;
+          color: $white;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &:hover {
+            background: $bright-orange;
+            transform: scale(1.05);
+          }
+
+          @media (max-width: $breakpoint-mobile) {
+            padding: 0.6rem 0.8rem;
+          }
+        }
+      }
+
+      .summary-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+
+        .summary-row {
+          display: flex;
+          justify-content: space-between;
+          font-size: clamp(0.9rem, 2vw, 1rem);
+          color: $text-dark;
+
+          &.total {
+            font-weight: 600;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+            border-top: 1px solid $shadow-medium;
+            padding-top: 0.8rem;
+          }
+        }
+      }
+
+      .proceed-button {
+        padding: 0.8rem 1.5rem;
+        font-size: clamp(0.9rem, 2vw, 1rem);
+        font-weight: 600;
+        background: $primary-brand;
+        color: $white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: $bright-orange;
+          transform: scale(1.05);
+        }
+
+        &:disabled {
+          background: #cccccc;
+          cursor: not-allowed;
+        }
+
+        @media (max-width: $breakpoint-mobile) {
+          padding: 0.7rem 1rem;
+        }
+      }
+    }
+  }
+
+  .shipping-form {
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+
+    @media (max-width: $breakpoint-mobile) {
+      gap: 0.6rem;
+    }
+
+    select,
+    input,
+    textarea {
+      padding: 0.7rem;
+      border: 2px solid $accent-yellow;
+      border-radius: 8px;
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      color: $text-dark;
+      text-align: right;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-brand;
+      }
+
+      @media (max-width: $breakpoint-mobile) {
+        padding: 0.6rem;
+      }
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .payment-method {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      label {
+        font-size: clamp(0.9rem, 2vw, 1rem);
+        font-weight: 600;
+        color: $text-dark;
+      }
+
+      .payment-option {
+        font-size: clamp(0.9rem, 2vw, 1rem);
+        color: $text-dark;
+        padding: 0.7rem;
+        background: $white;
+        border: 2px solid $accent-yellow;
+        border-radius: 8px;
+        text-align: right;
+
+        @media (max-width: $breakpoint-mobile) {
+          padding: 0.6rem;
+        }
+      }
+    }
+
+    .order-details-summary {
+      background: $white;
+      border: 1px solid $shadow-medium;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+
+      h4 {
+        font-size: clamp(1.1rem, 3vw, 1.2rem);
+        font-weight: 700;
+        color: $primary-brand;
+        margin-bottom: 0.8rem;
+        text-align: right;
+        position: relative;
+        padding-bottom: 0.4rem;
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          right: 0;
+          width: 40px;
+          height: 3px;
+          background: $accent-yellow;
+          border-radius: 2px;
+        }
+      }
+
+      p {
+        font-size: clamp(0.85rem, 2vw, 0.95rem);
+        color: $text-dark;
+        margin-bottom: 0.5rem;
+        text-align: right;
+
+        strong {
+          color: $primary-brand;
+        }
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+
+      @media (max-width: $breakpoint-mobile) {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .action-button {
+        padding: 0.7rem 1.5rem;
+        font-size: clamp(0.9rem, 2vw, 1rem);
+        font-weight: 600;
+        background: $primary-brand;
+        color: $white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: $bright-orange;
+          transform: scale(1.05);
+        }
+
+        &:disabled {
+          background: #cccccc;
+          cursor: not-allowed;
+        }
+
+        @media (max-width: $breakpoint-mobile) {
+          padding: 0.7rem;
+          width: 100%;
+        }
+      }
+    }
+  }
+}

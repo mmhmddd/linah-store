@@ -14,7 +14,7 @@ $shadow-light: rgba(255, 255, 255, 0.1); // White-based shadow for dark backgrou
 $shadow-medium: rgba(255, 255, 255, 0.15);
 
 .navbar {
-  background: $primary-bg; // Solid dark teal
+  background: $primary-bg;
   padding: 1.3rem 0;
   box-shadow: 0 2px 8px $shadow-light;
   border-bottom: 1px solid $accent-yellow;
@@ -59,7 +59,7 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
 }
 
 .navbar-brand .logo-img:hover {
-  border-color: $accent-pink; // Match favorite button icon color
+  border-color: $accent-pink;
   box-shadow: 0 4px 8px $shadow-medium;
 }
 
@@ -67,7 +67,7 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
   font-family: 'Reem Kufi', sans-serif;
   font-size: 1.6rem;
   font-weight: 700;
-  color: $white; // White to match text-primary
+  color: $white;
   margin: 0;
   line-height: 1.2;
   display: flex;
@@ -80,14 +80,14 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
 
 .navbar-brand .sub-title {
   font-size: 1.7rem;
-  color: $accent-yellow; // Consistent highlight
+  color: $accent-yellow;
 }
 
 .navbar-toggler {
   border: 1px solid $accent-yellow;
   padding: 0.5rem;
   border-radius: 6px;
-  background: $white; // Match favorite button background
+  background: $white;
   box-shadow: 0 1px 3px $shadow-light;
   position: absolute;
   left: 1rem;
@@ -111,48 +111,68 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
   background: none;
 }
 
-.navbar-toggler-icon::before,
-.navbar-toggler-icon::after,
-.navbar-toggler-icon span {
-  content: '';
+.navbar-toggler-icon .bar {
   position: absolute;
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: $accent-pink; // Match favorite button icon
+  background-color: $accent-pink;
   border-radius: 2px;
   transition: all 0.3s ease;
 }
 
-.navbar-toggler-icon::before {
+.navbar-toggler-icon .bar1 {
   top: 0;
 }
 
-.navbar-toggler-icon span {
-  top: 8px;
+.navbar-toggler-icon .bar2 {
+  top: 7px;
 }
 
-.navbar-toggler-icon::after {
-  bottom: 0;
+.navbar-toggler-icon .bar3 {
+  top: 14px;
 }
 
-.navbar-toggler[aria-expanded="true"] .navbar-toggler-icon::before {
+.navbar-toggler[aria-expanded="true"] .navbar-toggler-icon .bar1 {
   transform: rotate(45deg) translate(5px, 5px);
 }
 
-.navbar-toggler[aria-expanded="true"] .navbar-toggler-icon span {
+.navbar-toggler[aria-expanded="true"] .navbar-toggler-icon .bar2 {
   opacity: 0;
 }
 
-.navbar-toggler[aria-expanded="true"] .navbar-toggler-icon::after {
+.navbar-toggler[aria-expanded="true"] .navbar-toggler-icon .bar3 {
   transform: rotate(-45deg) translate(5px, -5px);
 }
 
 .navbar-collapse {
   flex-grow: 1;
-  display: flex !important;
   justify-content: center;
   align-items: center;
+
+  @media (min-width: 992px) {
+    display: flex !important; // Flex for desktop
+  }
+
+  @media (max-width: 991.98px) {
+    display: none !important; // Hidden by default on mobile
+    background: $primary-brand;
+    margin-top: 0.4rem;
+    padding: 0.8rem;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px $shadow-medium;
+    border: 1px solid $accent-yellow;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+
+    &.show {
+      display: block !important; // Show when toggled
+      animation: slideDown 0.3s ease;
+    }
+  }
 }
 
 .navbar-nav {
@@ -172,7 +192,7 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
 }
 
 .nav-item .nav-link {
-  color: $text-primary; // White to match favorite button text
+  color: $text-primary;
   font-size: 1rem;
   font-weight: 600;
   padding: 0.5rem 1rem;
@@ -188,7 +208,7 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
 
 .nav-item .nav-link i {
   font-size: 1rem;
-  color: $accent-pink; // Match favorite button icon
+  color: $accent-pink;
   transition: color 0.4s ease-in-out;
 }
 
@@ -199,18 +219,20 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
   right: 0;
   width: 0;
   height: 3px;
-  background: $accent-yellow; // Consistent highlight
+  background: $accent-yellow;
   transition: width 0.4s ease-in-out, right 0.4s ease-in-out;
 }
 
-.nav-item .nav-link:hover, .nav-item .nav-link.router-link-active {
-  background: $white; // Match favorite button background
-  color: $primary-brand; // Match favorite button hover text
+.nav-item .nav-link:hover,
+.nav-item .nav-link.router-link-active {
+  background: $white;
+  color: $primary-brand;
   box-shadow: 0 3px 6px $shadow-medium;
 }
 
-.nav-item .nav-link:hover i, .nav-item .nav-link.router-link-active i {
-  color: $accent-yellow; // Match favorite button hover icon
+.nav-item .nav-link:hover i,
+.nav-item .nav-link.router-link-active i {
+  color: $accent-yellow;
 }
 
 .nav-item .nav-link.router-link-active::after {
@@ -225,7 +247,7 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
 }
 
 .navbar-actions .action-link {
-  color: $text-primary; // White to match favorite button
+  color: $text-primary;
   font-size: 0.9rem;
   font-weight: 600;
   padding: 0.4rem 0.8rem;
@@ -235,14 +257,14 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
   align-items: center;
   gap: 0.4rem;
   transition: all 0.3s ease;
-  background: $white; // Match favorite button background
+  background: $white;
   border: 1px solid transparent;
   box-shadow: 0 1px 3px $shadow-light;
 }
 
 .navbar-actions .action-link i {
   font-size: 1rem;
-  color: $accent-pink; // Match favorite button icon
+  color: $accent-pink;
 }
 
 .navbar-actions .action-link .action-text {
@@ -252,39 +274,39 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
 
 .navbar-actions .action-link:hover {
   transform: translateY(-2px);
-  border-color: $accent-yellow; // Match favorite button hover
-  color: $primary-brand; // Match favorite button hover text
+  border-color: $accent-yellow;
+  color: $primary-brand;
 }
 
 .navbar-actions .action-link:hover i {
-  color: $accent-yellow; // Match favorite button hover icon
+  color: $accent-yellow;
 }
 
 .navbar-actions .action-link.cart-link {
-  background: $white; // Match favorite button background
+  background: $white;
   color: $primary-brand;
 }
 
 .navbar-actions .action-link.cart-link i {
-  color: $accent-pink; // Consistent with favorite button icon
+  color: $accent-pink;
 }
 
 .navbar-actions .action-link.cart-link:hover {
-  background: $button-yellow; // Use yellow for hover to align with theme
+  background: $button-yellow;
   color: $primary-brand;
 }
 
 .navbar-actions .action-link.login-btn {
-  background: $white; // Match favorite button background
+  background: $white;
   color: $primary-brand;
 }
 
 .navbar-actions .action-link.login-btn i {
-  color: $accent-pink; // Match favorite button icon
+  color: $accent-pink;
 }
 
 .navbar-actions .action-link.login-btn:hover {
-  background: $button-yellow; // Use yellow for hover
+  background: $button-yellow;
   color: $primary-brand;
 }
 
@@ -298,17 +320,17 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  border: 1px solid $accent-yellow; // Match favorite button border
+  border: 1px solid $accent-yellow;
   transition: all 0.3s ease;
 }
 
 .user-section .dropdown-toggle .user-avatar:hover {
-  border-color: $accent-pink; // Match favorite button icon
+  border-color: $accent-pink;
   box-shadow: 0 3px 6px $shadow-medium;
 }
 
 .user-section .dropdown-menu {
-  background: $white; // Match favorite button background
+  background: $white;
   border: 1px solid $accent-yellow;
   border-radius: 10px;
   padding: 0.4rem;
@@ -317,7 +339,7 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
 }
 
 .user-section .dropdown-menu .dropdown-item {
-  color: $primary-brand; // Match favorite button hover text
+  color: $primary-brand;
   font-size: 0.85rem;
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
@@ -328,16 +350,16 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
 }
 
 .user-section .dropdown-menu .dropdown-item i {
-  color: $accent-pink; // Match favorite button icon
+  color: $accent-pink;
 }
 
 .user-section .dropdown-menu .dropdown-item:hover {
-  background: $button-yellow; // Match hover color
+  background: $button-yellow;
   color: $primary-brand;
 }
 
 .user-section .dropdown-menu .dropdown-item:hover i {
-  color: $accent-yellow; // Match favorite button hover icon
+  color: $accent-yellow;
 }
 
 .user-section .dropdown-menu .dropdown-divider {
@@ -350,28 +372,10 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
     padding: 0.4rem 0;
   }
 
-  .navbar-brand, .navbar-toggler, .navbar-actions {
+  .navbar-brand,
+  .navbar-toggler,
+  .navbar-actions {
     position: static;
-  }
-
-  .navbar-collapse {
-    background: $primary-brand; // Match navbar background
-    margin-top: 0.4rem;
-    padding: 0.8rem;
-    border-radius: 10px;
-    box-shadow: 0 6px 18px $shadow-medium;
-    border: 1px solid $accent-yellow;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    display: none !important;
-  }
-
-  .navbar-collapse.show {
-    display: block !important;
-    animation: slideDown 0.3s ease;
   }
 
   .navbar-nav {
@@ -387,16 +391,18 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
     justify-content: center;
     padding: 0.6rem;
     font-size: 1rem;
-    color: $white; // Match text-primary
+    color: $white;
     background: transparent;
   }
 
-  .navbar-nav .nav-link:hover, .navbar-nav .nav-link.router-link-active {
-    background: $white; // Match favorite button
+  .navbar-nav .nav-link:hover,
+  .navbar-nav .nav-link.router-link-active {
+    background: $white;
     color: $primary-brand;
   }
 
-  .navbar-nav .nav-link:hover i, .navbar-nav .nav-link.router-link-active i {
+  .navbar-nav .nav-link:hover i,
+  .navbar-nav .nav-link.router-link-active i {
     color: $accent-yellow;
   }
 

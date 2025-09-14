@@ -5,7 +5,7 @@
     <a class="navbar-brand" routerLink="/">
       <img src="/assets/images/logo.png" alt="شعار متجر لينا للأطفال" class="logo-img">
       <h1 class="brand-text">
-        <span class="main-title">لينه </span>
+        <span class="main-title">لينه</span>
         <span class="sub-title">ثمارها اطفالنا</span>
       </h1>
     </a>
@@ -15,8 +15,13 @@
       type="button"
       (click)="toggleMobileMenu()"
       [attr.aria-expanded]="isMobileMenuOpen"
+      aria-controls="navbarNav"
       aria-label="تبديل القائمة">
-      <span class="navbar-toggler-icon"><span></span></span>
+      <span class="navbar-toggler-icon">
+        <span class="bar bar1"></span>
+        <span class="bar bar2"></span>
+        <span class="bar bar3"></span>
+      </span>
     </button>
 
     <div class="navbar-collapse" [class.show]="isMobileMenuOpen" id="navbarNav">
