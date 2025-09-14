@@ -1,8 +1,8 @@
-$primary-bg: #26735D; // Dark teal for main background
-$light-bg: #26735D; // Consistent with primary-bg
+$primary-bg: #26735D;
+$light-bg: #26735D;
 $primary-brand: #26735D;
 $accent-yellow: #F2CC0F;
-$text-primary: #FFFFFF; // White for readability
+$text-primary: #FFFFFF;
 $hover-green: #92BF4E;
 $accent-pink: #F26BB5;
 $button-yellow: #F2CB05;
@@ -10,7 +10,7 @@ $button-hover: #F2E30C;
 $danger-red: #F25252;
 $dropdown-border: #F2CC0F;
 $white: #FFFFFF;
-$shadow-light: rgba(255, 255, 255, 0.1); // White-based shadow for dark background
+$shadow-light: rgba(255, 255, 255, 0.1);
 $shadow-medium: rgba(255, 255, 255, 0.15);
 
 .navbar {
@@ -151,11 +151,11 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
   align-items: center;
 
   @media (min-width: 992px) {
-    display: flex !important; // Flex for desktop
+    display: flex !important;
   }
 
   @media (max-width: 991.98px) {
-    display: none !important; // Hidden by default on mobile
+    display: none !important;
     background: $primary-brand;
     margin-top: 0.4rem;
     padding: 0.8rem;
@@ -169,7 +169,7 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
     z-index: 1000;
 
     &.show {
-      display: block !important; // Show when toggled
+      display: block !important;
       animation: slideDown 0.3s ease;
     }
   }
@@ -310,61 +310,22 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
   color: $primary-brand;
 }
 
-.user-section .dropdown-toggle {
-  background: none;
-  border: none;
-  padding: 0;
+.navbar-actions .action-link.logout-btn {
+  background: $danger-red;
+  color: $white;
 }
 
-.user-section .dropdown-toggle .user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1px solid $accent-yellow;
-  transition: all 0.3s ease;
+.navbar-actions .action-link.logout-btn i {
+  color: $white;
 }
 
-.user-section .dropdown-toggle .user-avatar:hover {
-  border-color: $accent-pink;
-  box-shadow: 0 3px 6px $shadow-medium;
+.navbar-actions .action-link.logout-btn:hover {
+  background: darken($danger-red, 10%);
+  color: $white;
 }
 
-.user-section .dropdown-menu {
-  background: $white;
-  border: 1px solid $accent-yellow;
-  border-radius: 10px;
-  padding: 0.4rem;
-  box-shadow: 0 6px 18px $shadow-medium;
-  min-width: 160px;
-}
-
-.user-section .dropdown-menu .dropdown-item {
-  color: $primary-brand;
-  font-size: 0.85rem;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  transition: all 0.2s ease;
-}
-
-.user-section .dropdown-menu .dropdown-item i {
-  color: $accent-pink;
-}
-
-.user-section .dropdown-menu .dropdown-item:hover {
-  background: $button-yellow;
-  color: $primary-brand;
-}
-
-.user-section .dropdown-menu .dropdown-item:hover i {
-  color: $accent-yellow;
-}
-
-.user-section .dropdown-menu .dropdown-divider {
-  border-color: $accent-yellow;
-  margin: 0.4rem 0;
+.navbar-actions .action-link.logout-btn:hover i {
+  color: $white;
 }
 
 @media (max-width: 991.98px) {

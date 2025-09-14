@@ -249,6 +249,7 @@ $glow-color: rgba(78, 205, 196, 0.3);
   font-weight: 600;
   color: $text-primary;
   margin-bottom: 0.75rem;
+  display: block;
 }
 
 .input-wrapper {
@@ -314,16 +315,6 @@ $glow-color: rgba(78, 205, 196, 0.3);
   display: block;
   min-height: 1.2rem;
 }
-
-.form-options {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
 
 .submit-btn {
   width: 100%;
@@ -446,6 +437,15 @@ $glow-color: rgba(78, 205, 196, 0.3);
     color: $primary-green;
     transform: scale(1.2);
   }
+}
+
+.debug-info {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: $light-gray;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: $text-primary;
 }
 
 @media (max-width: 768px) {

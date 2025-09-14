@@ -50,39 +50,14 @@
           <span class="action-text">{{ cartText }}</span>
         </a>
 
-        <div class="user-section" *ngIf="isLoggedIn; else loginButton">
-          <div class="dropdown">
-            <button class="dropdown-toggle user-avatar" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="/assets/images/user-avatar.png" alt="صورة المستخدم" class="user-avatar">
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-              <ng-container *ngFor="let item of dropdownItems">
-                <li *ngIf="item.link">
-                  <a class="dropdown-item" [routerLink]="item.link" (click)="toggleMobileMenu()">
-                    <i class="bi {{ item.icon }}"></i>
-                    {{ item.text }}
-                  </a>
-                </li>
-                <li *ngIf="item.action">
-                  <button class="dropdown-item" (click)="item.action(); toggleMobileMenu()">
-                    <i class="bi {{ item.icon }}"></i>
-                    {{ item.text }}
-                  </button>
-                </li>
-                <li *ngIf="item.separator">
-                  <hr class="dropdown-divider">
-                </li>
-              </ng-container>
-            </ul>
-          </div>
-        </div>
-
-        <ng-template #loginButton>
-          <a class="action-link login-btn" routerLink="/login" (click)="toggleMobileMenu()">
-            <i class="bi bi-box-arrow-in-right"></i>
-            <span class="action-text">{{ loginText }}</span>
-          </a>
-        </ng-template>
+        <a
+          class="action-link login-btn"
+          [class.logout-btn]="isLoggedIn"
+          [routerLink]="isLoggedIn ? null : '/login'"
+          (click)="handleAuthAction()">
+          <i class="bi" [ngClass]="isLoggedIn ? 'bi-box-arrow-right' : 'bi-box-arrow-in-right'"></i>
+          <span class="action-text">{{ loginText }}</span>
+        </a>
       </div>
     </div>
   </div>

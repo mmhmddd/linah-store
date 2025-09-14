@@ -22,7 +22,7 @@
     </div>
 
     <!-- Welcome Section -->
-    <div class="welcome-section">
+    <div class="welcome-section" *ngIf="showWelcome">
       <h1 class="welcome-title">{{ welcomeMessage }}</h1>
       <p class="welcome-text">انضم إلينا وابدأ رحلتك!</p>
     </div>
@@ -73,6 +73,60 @@
         </div>
 
         <div class="form-group">
+          <label for="phone" class="form-label">رقم الهاتف</label>
+          <div class="input-wrapper">
+            <input
+              type="text"
+              id="phone"
+              formControlName="phone"
+              class="form-control"
+              placeholder="أدخل رقم الهاتف"
+              (focus)="onFieldFocus('phone')"
+              (blur)="onFieldBlur('phone')"
+              [class.invalid]="isFieldInvalid('phone')"
+            />
+            <div class="input-border"></div>
+          </div>
+          <span class="error-message" *ngIf="isFieldInvalid('phone')">{{ getErrorMessage('phone') }}</span>
+        </div>
+
+        <div class="form-group">
+          <label for="address" class="form-label">العنوان</label>
+          <div class="input-wrapper">
+            <input
+              type="text"
+              id="address"
+              formControlName="address"
+              class="form-control"
+              placeholder="أدخل عنوانك"
+              (focus)="onFieldFocus('address')"
+              (blur)="onFieldBlur('address')"
+              [class.invalid]="isFieldInvalid('address')"
+            />
+            <div class="input-border"></div>
+          </div>
+          <span class="error-message" *ngIf="isFieldInvalid('address')">{{ getErrorMessage('address') }}</span>
+        </div>
+
+        <div class="form-group">
+          <label for="age" class="form-label">العمر</label>
+          <div class="input-wrapper">
+            <input
+              type="number"
+              id="age"
+              formControlName="age"
+              class="form-control"
+              placeholder="أدخل عمرك"
+              (focus)="onFieldFocus('age')"
+              (blur)="onFieldBlur('age')"
+              [class.invalid]="isFieldInvalid('age')"
+            />
+            <div class="input-border"></div>
+          </div>
+          <span class="error-message" *ngIf="isFieldInvalid('age')">{{ getErrorMessage('age') }}</span>
+        </div>
+
+        <div class="form-group">
           <label for="password" class="form-label">كلمة المرور</label>
           <div class="input-wrapper">
             <input
@@ -114,7 +168,6 @@
           <span class="error-message" *ngIf="isFieldInvalid('confirmPassword')">{{ getErrorMessage('confirmPassword') }}</span>
         </div>
 
-
         <button type="submit" class="submit-btn" [disabled]="!isFormReady" id="submitBtn">
           <span>إنشاء الحساب</span>
           <i class="bi bi-person-plus"></i>
@@ -132,6 +185,13 @@
             <i class="bi bi-box-arrow-in-right"></i>
             تسجيل الدخول
           </a>
+        </div>
+
+        <!-- Debug Info -->
+        <div class="debug-info">
+          <p>Form Valid: {{ registerForm.valid }}</p>
+          <p>Form Errors: {{ registerForm.errors | json }}</p>
+          <p>Form Values: {{ registerForm.value | json }}</p>
         </div>
       </form>
 

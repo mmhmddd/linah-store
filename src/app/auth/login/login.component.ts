@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'; // Add CommonModule
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { isPlatformBrowser } from '@angular/common';
-
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { AuthService } from '../../core/services/auth.service';
 interface LoginFormData {
   email: string;
   password: string;
@@ -17,7 +17,7 @@ interface ValidationMessages {
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule], // Add CommonModule here
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
@@ -52,11 +52,15 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
+    private authService: AuthService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.loginForm = this.createForm();
   }
 
+  // Rest of the component code remains unchanged
+  // ... (ngOnInit, ngOnDestroy, createForm, etc.)
+  // Include all methods from your original login.component.ts
   ngOnInit(): void {
     this.initializeComponent();
     this.setupFormValidation();
@@ -175,9 +179,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       try {
         const formData: LoginFormData = this.loginForm.value;
         await this.performLogin(formData);
-        setTimeout(() => {
-          this.router.navigate(['/dashboard']);
-        }, 1000);
+        this.router.navigate(['/dashboard']);
       } catch (error: any) {
         this.handleLoginError(error);
       } finally {
@@ -190,14 +192,21 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   private async performLogin(formData: LoginFormData): Promise<void> {
+    const credentials = {
+      email: formData.email,
+      password: formData.password
+    };
+
     return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (formData.email && formData.password) {
+      this.authService.login(credentials).subscribe({
+        next: (response) => {
+          console.log('Login successful', response);
           resolve();
-        } else {
-          reject({ message: 'بيانات غير صحيحة' });
+        },
+        error: (error) => {
+          reject(error);
         }
-      }, 1500);
+      });
     });
   }
 
@@ -218,21 +227,23 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   onSignup(event: Event): void {
-    event.preventDefault;
-    this.router.navigate(['/signup']);
+    event.preventDefault();
+    this.router.navigate(['/register']);
   }
 
   private addPageInteractivity(): void {
-    const shapes = document.querySelectorAll('.floating-shape');
-    shapes.forEach(shape => {
-      shape.addEventListener('mouseenter', () => {
-        (shape as HTMLElement).style.animationDuration = '2s';
+    if (isPlatformBrowser(this.platformId)) {
+      const shapes = document.querySelectorAll('.floating-shape');
+      shapes.forEach(shape => {
+        shape.addEventListener('mouseenter', () => {
+          (shape as HTMLElement).style.animationDuration = '2s';
+        });
+        shape.addEventListener('mouseleave', () => {
+          (shape as HTMLElement).style.animationDuration = '6s';
+        });
       });
-      shape.addEventListener('mouseleave', () => {
-        (shape as HTMLElement).style.animationDuration = '6s';
-      });
-    });
-    document.addEventListener('click', this.playClickSound.bind(this));
+      document.addEventListener('click', this.playClickSound.bind(this));
+    }
   }
 
   private playClickSound(): void {

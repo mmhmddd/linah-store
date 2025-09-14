@@ -2,14 +2,17 @@ import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { AuthService } from '../../core/services/auth.service';
 
 interface RegisterFormData {
   name: string;
   email: string;
   password: string;
   confirmPassword: string;
-  termsAgreement: boolean;
+  phone: string;
+  address: string;
+  age: number;
 }
 
 interface ValidationMessages {
@@ -19,7 +22,7 @@ interface ValidationMessages {
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
@@ -52,13 +55,22 @@ export class RegisterComponent implements OnInit, OnDestroy {
       required: 'تأكيد كلمة المرور مطلوب',
       mismatch: 'كلمة المرور غير متطابقة'
     },
-    termsAgreement: {
-      requiredTrue: 'يجب الموافقة على الشروط وسياسة الخصوصية'
+    phone: {
+      required: 'رقم الهاتف مطلوب',
+      pattern: 'يرجى إدخال رقم هاتف صحيح'
+    },
+    address: {
+      required: 'العنوان مطلوب',
+      minlength: 'العنوان يجب أن يكون 5 أحرف على الأقل'
+    },
+    age: {
+      required: 'العمر مطلوب',
+      min: 'العمر يجب أن يكون 18 عامًا أو أكثر'
     }
   };
 
   private welcomeMessages: string[] = [
-    '🎉مرحباً بك ',
+    '🎉مرحباً بك',
     '🚀انضم إلينا',
     '🌟ابدأ رحلتك'
   ];
@@ -66,6 +78,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
+    private authService: AuthService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.registerForm = this.createForm();
@@ -111,7 +124,18 @@ export class RegisterComponent implements OnInit, OnDestroy {
         Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/)
       ]],
       confirmPassword: ['', [Validators.required]],
-      termsAgreement: [false, [Validators.requiredTrue]]
+      phone: ['', [
+        Validators.required,
+        Validators.pattern(/^\+?\d{10,15}$/) // Adjust pattern as needed
+      ]],
+      address: ['', [
+        Validators.required,
+        Validators.minLength(5)
+      ]],
+      age: ['', [
+        Validators.required,
+        Validators.min(18)
+      ]]
     }, {
       validators: this.passwordMatchValidator
     });
@@ -129,6 +153,13 @@ export class RegisterComponent implements OnInit, OnDestroy {
         this.submitError = '';
         this.validateFormFields();
         this.updateFormProgress();
+        console.log('Form Valid:', this.registerForm.valid);
+        console.log('Form Errors:', this.registerForm.errors);
+        console.log('Form Values:', this.registerForm.value);
+        Object.keys(this.registerForm.controls).forEach(key => {
+          const control = this.registerForm.get(key);
+          console.log(`${key} Valid:`, control?.valid, 'Errors:', control?.errors);
+        });
       })
     );
   }
@@ -203,14 +234,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.playClickSound();
   }
 
-  toggleTermsAgreement(): void {
-    const currentValue = this.registerForm.get('termsAgreement')?.value;
-    this.registerForm.patchValue({ termsAgreement: !currentValue });
-    this.registerForm.get('termsAgreement')?.markAsDirty();
-    this.registerForm.get('termsAgreement')?.markAsTouched();
-    this.playClickSound();
-  }
-
   async onSubmit(): Promise<void> {
     if (this.registerForm.valid && !this.isLoading) {
       this.isLoading = true;
@@ -219,9 +242,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       try {
         const formData: RegisterFormData = this.registerForm.value;
         await this.performRegister(formData);
-        setTimeout(() => {
-          this.router.navigate(['/dashboard']);
-        }, 1000);
+        this.router.navigate(['/dashboard']);
       } catch (error: any) {
         this.handleRegisterError(error);
       } finally {
@@ -234,19 +255,33 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   private async performRegister(formData: RegisterFormData): Promise<void> {
+    const credentials = {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      phone: formData.phone,
+      address: formData.address,
+      age: formData.age
+    };
+
     return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (formData.email && formData.password && formData.name && formData.termsAgreement) {
+      this.authService.register(credentials).subscribe({
+        next: (response) => {
+          console.log('Registration successful', response);
           resolve();
-        } else {
-          reject({ message: 'بيانات غير صحيحة' });
+        },
+        error: (error) => {
+          console.error('Registration failed', error);
+          console.log('Error URL:', error.url);
+          reject(error);
         }
-      }, 1500);
+      });
     });
   }
 
   private handleRegisterError(error: any): void {
     this.submitError = error.message || 'حدث خطأ في إنشاء الحساب. يرجى المحاولة مرة أخرى.';
+    console.error('Registration error details:', error);
     this.addShakeAnimation('registerForm');
   }
 
