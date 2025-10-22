@@ -1,4 +1,4 @@
-
+<!-- cart.component.html (unchanged) -->
 <div class="cart-container" dir="rtl">
   <!-- Step 1: Cart View -->
   <div *ngIf="step === 1" class="cart-step">
@@ -11,19 +11,16 @@
         </button>
         <div class="cart-items">
           <div *ngFor="let item of cartItems" class="book-card">
-            <div class="book-rating">
-              <span class="star" *ngFor="let _ of [].constructor(item.rating)">⭐</span>
-            </div>
             <div class="book-card-slideshow">
-              <div class="book-slide active" [style.backgroundImage]="'url(' + item.image + ')'"></div>
+              <div class="book-slide active" [style.backgroundImage]="'url(' + getImageUrl(item.book.imgs[0]) + ')'"></div>
             </div>
             <div class="book-content">
-              <div class="book-category-badge">🌳 {{item.category}}</div>
-              <h2 class="book-title">{{item.title}}</h2>
-              <p class="book-description">{{item.description}}</p>
+              <div class="book-category-badge">{{getCategoryEmoji(item.book.category)}} {{item.book.category}}</div>
+              <h2 class="book-title">{{item.book.name}}</h2>
+              <p class="book-description">{{item.book.description}}</p>
               <div class="book-price-container">
-                <span class="book-price">{{item.price * item.quantity | number:'1.2-2'}} ج.م</span>
-                <span class="price-badge">عرض خاص</span>
+                <span class="book-price">{{(item.book.price - (item.book.price * (item.book.offer / 100))) * item.quantity | number:'1.2-2'}} ج.م</span>
+                <span class="price-badge" *ngIf="item.book.offer > 0">خصم {{item.book.offer}}%</span>
               </div>
               <div class="book-actions">
                 <div class="quantity-control">
@@ -31,7 +28,7 @@
                   <span class="quantity">{{item.quantity}}</span>
                   <button class="quantity-button" (click)="updateQuantity(item, 1)" aria-label="زيادة الكمية">+</button>
                 </div>
-                <button class="action-button remove-button" (click)="removeFromCart(item.id)" aria-label="إزالة من السلة">
+                <button class="action-button remove-button" (click)="removeFromCart(item.book._id)" aria-label="إزالة من السلة">
                   <i class="fas fa-trash"></i>
                   <span class="button-tooltip">إزالة</span>
                 </button>
@@ -46,7 +43,7 @@
           <h3 class="summary-title">ملخص الطلب</h3>
           <div class="summary-content">
             <div class="coupon-section">
-              <input type="text" [(ngModel)]="couponCode" placeholder="كوبون الخصم" class="coupon-input" aria-label="إدخال كوبون الخصم">
+              <input type="text" [(ngModel)]="shippingInfo.saleCode" placeholder="كوبون الخصم" class="coupon-input" aria-label="إدخال كوبون الخصم">
               <button class="action-button apply-coupon" (click)="applyCoupon()">تأكيد</button>
             </div>
             <div class="summary-details">
@@ -80,19 +77,16 @@
         <h2 class="cart-title">عناصر السلة</h2>
         <div class="cart-items">
           <div *ngFor="let item of cartItems" class="book-card">
-            <div class="book-rating">
-              <span class="star" *ngFor="let _ of [].constructor(item.rating)">⭐</span>
-            </div>
             <div class="book-card-slideshow">
-              <div class="book-slide active" [style.backgroundImage]="'url(' + item.image + ')'"></div>
+              <div class="book-slide active" [style.backgroundImage]="'url(' + getImageUrl(item.book.imgs[0]) + ')'"></div>
             </div>
             <div class="book-content">
-              <div class="book-category-badge">🌳 {{item.category}}</div>
-              <h2 class="book-title">{{item.title}}</h2>
-              <p class="book-description">{{item.description}}</p>
+              <div class="book-category-badge">{{getCategoryEmoji(item.book.category)}} {{item.book.category}}</div>
+              <h2 class="book-title">{{item.book.name}}</h2>
+              <p class="book-description">{{item.book.description}}</p>
               <div class="book-price-container">
-                <span class="book-price">{{item.price * item.quantity | number:'1.2-2'}} ج.م</span>
-                <span class="price-badge">عرض خاص</span>
+                <span class="book-price">{{(item.book.price - (item.book.price * (item.book.offer / 100))) * item.quantity | number:'1.2-2'}} ج.م</span>
+                <span class="price-badge" *ngIf="item.book.offer > 0">خصم {{item.book.offer}}%</span>
               </div>
               <div class="book-actions">
                 <div class="quantity-control">
@@ -100,7 +94,7 @@
                   <span class="quantity">{{item.quantity}}</span>
                   <button class="quantity-button" (click)="updateQuantity(item, 1)" aria-label="زيادة الكمية">+</button>
                 </div>
-                <button class="action-button remove-button" (click)="removeFromCart(item.id)" aria-label="إزالة من السلة">
+                <button class="action-button remove-button" (click)="removeFromCart(item.book._id)" aria-label="إزالة من السلة">
                   <i class="fas fa-trash"></i>
                   <span class="button-tooltip">إزالة</span>
                 </button>
@@ -115,29 +109,32 @@
           <h3 class="summary-title">تفاصيل الطلب</h3>
           <div class="summary-content">
             <form class="shipping-form">
-              <select [(ngModel)]="shippingInfo.governorate" name="governorate" required aria-label="اختيار المحافظة">
+              <select [(ngModel)]="shippingInfo.government" name="government" required aria-label="اختيار المحافظة">
                 <option value="" disabled selected>اختر المحافظة</option>
                 <option *ngFor="let governorate of governorates" [value]="governorate">{{governorate}}</option>
               </select>
-              <input type="text" [(ngModel)]="shippingInfo.name" name="name" placeholder="الاسم الكامل" required aria-label="الاسم الكامل">
+              <input type="text" [(ngModel)]="shippingInfo.fullName" name="fullName" placeholder="الاسم الكامل" required aria-label="الاسم الكامل">
               <input type="text" [(ngModel)]="shippingInfo.address" name="address" placeholder="العنوان" required aria-label="العنوان">
-              <textarea [(ngModel)]="shippingInfo.notes" name="notes" placeholder="الملاحظات (اختياري)" aria-label="الملاحظات"></textarea>
               <div class="payment-method">
                 <label>طريقة الدفع</label>
-                <div class="payment-option">كاش عند الاستلام</div>
+                <div class="payment-options">
+                  <label><input type="radio" [(ngModel)]="shippingInfo.paymentMethod" name="paymentMethod" value="cash" required> كاش عند الاستلام</label>
+                  <label><input type="radio" [(ngModel)]="shippingInfo.paymentMethod" name="paymentMethod" value="visa" required> فيزا</label>
+                </div>
               </div>
+              <textarea [(ngModel)]="shippingInfo.notes" name="notes" placeholder="الملاحظات (اختياري)" aria-label="الملاحظات"></textarea>
               <div class="order-details-summary">
                 <h4>ملخص التفاصيل</h4>
-                <p *ngIf="shippingInfo.governorate"><strong>المحافظة:</strong> {{shippingInfo.governorate}}</p>
-                <p *ngIf="shippingInfo.name"><strong>الاسم:</strong> {{shippingInfo.name}}</p>
+                <p *ngIf="shippingInfo.government"><strong>المحافظة:</strong> {{shippingInfo.government}}</p>
+                <p *ngIf="shippingInfo.fullName"><strong>الاسم:</strong> {{shippingInfo.fullName}}</p>
                 <p *ngIf="shippingInfo.address"><strong>العنوان:</strong> {{shippingInfo.address}}</p>
+                <p *ngIf="shippingInfo.paymentMethod"><strong>طريقة الدفع:</strong> {{shippingInfo.paymentMethod === 'cash' ? 'كاش عند الاستلام' : 'فيزا'}}</p>
                 <p *ngIf="shippingInfo.notes"><strong>الملاحظات:</strong> {{shippingInfo.notes}}</p>
-                <p><strong>طريقة الدفع:</strong> كاش عند الاستلام</p>
                 <p><strong>المبلغ الكلي:</strong> {{getTotalPrice() | number:'1.2-2'}} ج.م</p>
               </div>
               <div class="form-actions">
                 <button type="button" class="action-button" (click)="prevStep()" aria-label="رجوع">رجوع</button>
-                <button type="button" class="action-button" (click)="submitShipping()" [disabled]="!shippingInfo.governorate || !shippingInfo.name || !shippingInfo.address" aria-label="تأكيد الطلب">تأكيد الطلب</button>
+                <button type="button" class="action-button" (click)="submitShipping()" [disabled]="!shippingInfo.government || !shippingInfo.fullName || !shippingInfo.address || !shippingInfo.paymentMethod" aria-label="تأكيد الطلب">تأكيد الطلب</button>
               </div>
             </form>
           </div>

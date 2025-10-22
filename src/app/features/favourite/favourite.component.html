@@ -1,79 +1,147 @@
-<div class="favourite-container" dir="rtl" role="region" aria-label="قائمة المفضلة">
-  <header class="favourite-header">
-    <h2 class="favourite-title">المفضلة</h2>
-    <button *ngIf="favouriteItems.length > 0" class="action-button clear-favourites" (click)="openClearModal()" aria-label="مسح جميع المفضلة" type="button">
-      مسح الكل
-    </button>
-  </header>
-
-  <!-- Favorites List -->
-  <div *ngIf="favouriteItems.length > 0; else emptyState" class="favourite-items">
-    <div *ngFor="let item of favouriteItems; trackBy: trackById" class="book-card" role="article" [attr.aria-labelledby]="'book-title-' + item.id">
-      <div class="book-card-image" [style.backgroundImage]="'url(' + item.image + ')'" [attr.aria-label]="'صورة الكتاب: ' + item.title">
-        <div class="book-rating" [attr.aria-label]="'التقييم: ' + item.rating + ' نجوم'">
-          <span class="star" *ngFor="let _ of [].constructor(item.rating)" aria-hidden="true">⭐</span>
+<!-- features/favourite/favourite.component.html -->
+<div class="favourite-container">
+  <main class="books-main">
+    <header class="books-header">
+      <div class="header-content">
+        <div class="header-text">
+          <h1 class="header-title">المفضلة</h1>
+          <p class="header-subtitle">كتبك المفضلة ({{ favouriteItems.length }})</p>
         </div>
       </div>
-      <div class="book-content">
-        <div class="book-category-badge">{{item.category}}</div>
-        <h3 class="book-title" [id]="'book-title-' + item.id">{{item.title}}</h3>
-        <p class="book-description">{{item.description}}</p>
-        <div class="book-footer">
-          <div class="book-price-container">
-            <span class="book-price">{{item.price | number:'1.2-2'}} ج.م</span>
+    </header>
+
+    <div class="books-list-section">
+      <div class="section-header">
+        <h2 class="section-title-main">قائمة المفضلة</h2>
+        <div class="books-count">
+          <span class="count-number">{{ favouriteItems.length }}</span>
+          <span class="count-text">كتاب</span>
+        </div>
+      </div>
+
+      <div class="favourite-grid">
+        <div *ngFor="let book of favouriteItems; trackBy: trackById" class="book-card">
+          <!-- ✅ EXACT SAME IMAGE SECTION -->
+          <div class="book-image-container">
+            <div class="image-wrapper">
+              <img
+                [src]="getImageUrl(book.imgs[0])"
+                [alt]="book.name"
+                class="book-image"
+                (error)="handleImageError(book._id)"
+                loading="lazy" />
+              <div class="stock-badge" [class.out-of-stock]="book.stockStatus === 'outOfStock'">
+                {{ book.stockStatus === 'inStock' ? 'متوفر' : 'غير متوفر' }}
+              </div>
+              <div class="offer-badge" *ngIf="book.offer > 0">
+                خصم {{ book.offer }}%
+              </div>
+            </div>
+            <div class="image-thumbnails-small" *ngIf="book.imgs.length > 1">
+              <div
+                *ngFor="let img of book.imgs.slice(0, 4); let i = index"
+                class="thumbnail-small"
+                (click)="openImageModal(img, book)">
+                <img [src]="getImageUrl(img)" [alt]="book.name" />
+              </div>
+              <div class="more-images" *ngIf="book.imgs.length > 4" (click)="openImageModal(book.imgs[0], book)">
+                +{{ book.imgs.length - 4 }}
+              </div>
+            </div>
           </div>
-          <div class="button-group">
+
+          <!-- ✅ EXACT SAME CONTENT SECTION -->
+          <div class="book-content">
+            <h3 class="book-name">{{ book.name }}</h3>
+            <p class="book-title">{{ book.title }}</p>
+            <div class="book-category">{{ getCategoryEmoji(book.category) }} {{ book.category }}</div>
+
+            <!-- ✅ BOOK DETAILS (Code + Quantity) -->
+            <div class="book-details">
+              <div class="detail-item">
+                <span class="detail-label">الكود:</span>
+                <span class="detail-value">{{ book.code || 'غير محدد' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">الكمية:</span>
+                <span class="detail-value">{{ book.quantity }}</span>
+              </div>
+            </div>
+
+            <!-- ✅ EXACT SAME PRICE SECTION -->
+            <div class="book-price">
+              <div class="price-main">
+                <span class="current-price">{{ calculateBookFinalPrice(book) | number:'1.2-2' }}</span>
+                <span class="currency">جنيه</span>
+              </div>
+              <div class="price-original" *ngIf="book.offer > 0">
+                <span class="original-amount">{{ book.price | number:'1.2-2' }}</span>
+              </div>
+            </div>
+
+            <!-- ✅ CART BUTTON ONLY (Remove Favorite is separate) -->
+            <div class="book-actions">
+              <button
+                class="action-btn cart"
+                (click)="toggleCart(book)"
+                [class.active]="isInCart(book)">
+                {{ isInCart(book) ? 'إزالة من السلة' : 'أضف إلى السلة' }}
+              </button>
+            </div>
+
+            <!-- ✅ REMOVE FAVORITE BUTTON (Above description) -->
             <button
-              class="action-button favourite-button"
-              [ngClass]="{'active': isFavourite(item)}"
-              (click)="toggleFavourite(item)"
-              [attr.aria-label]="isFavourite(item) ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة'"
-              type="button">
-              <i class="fas fa-heart" aria-hidden="true"></i>
-              <span class="button-tooltip">{{isFavourite(item) ? 'إزالة' : 'إضافة'}}</span>
+              class="remove-fav-btn"
+              (click)="removeFromFavorites(book)">
+              <span>🗑️ إزالة من المفضلة</span>
             </button>
-            <button
-              class="action-button cart-button"
-              [ngClass]="{'active': isInCart(item)}"
-              (click)="toggleCart(item)"
-              [attr.aria-label]="isInCart(item) ? 'إزالة من السلة' : 'إضافة إلى السلة'"
-              type="button">
-              <i class="fas fa-shopping-cart" aria-hidden="true"></i>
-              <span class="button-tooltip">{{isInCart(item) ? 'إزالة من السلة' : 'إضافة إلى السلة'}}</span>
-            </button>
+
+            <!-- ✅ DESCRIPTION -->
+            <div class="book-description" *ngIf="book.description">
+              {{ book.description | slice:0:80 }}{{ book.description.length > 80 ? '...' : '' }}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Empty State -->
-  <ng-template #emptyState>
-    <div class="empty-state" role="alert">
-      <div class="empty-state-content">
-        <i class="fas fa-heart-broken empty-icon" aria-hidden="true"></i>
-        <h3 class="empty-title">قائمة المفضلة فارغة</h3>
-        <p class="empty-description">لم تقم بإضافة أي كتب بعد. تصفح مجموعتنا وأضف كتبك المفضلة!</p>
-        <button class="action-button explore-button" (click)="exploreBooks()" aria-label="استكشاف الكتب" type="button">
-          استكشاف الآن
-        </button>
+      <!-- ✅ EMPTY STATE -->
+      <div class="empty-state" *ngIf="favouriteItems.length === 0">
+        <div class="empty-icon">❤️</div>
+        <h3>قائمة المفضلة فارغة</h3>
+        <p>لم تقم بإضافة أي كتب بعد. تصفح مجموعتنا وأضف كتبك المفضلة!</p>
+        <button class="explore-btn" (click)="exploreBooks()">استكشاف الآن</button>
       </div>
     </div>
-  </ng-template>
 
-  <!-- Clear Favorites Modal -->
-  <div *ngIf="showClearModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal">
-      <h3 class="modal-title" id="modal-title">تأكيد المسح</h3>
-      <p class="modal-description">هل تريد مسح جميع الكتب من المفضلة؟</p>
-      <div class="modal-actions">
-        <button class="action-button cancel-button" (click)="closeClearModal()" aria-label="إلغاء" type="button">
-          إلغاء
-        </button>
-        <button class="action-button confirm-button" (click)="clearFavourites()" aria-label="تأكيد" type="button">
-          تأكيد
-        </button>
+    <!-- ✅ CLEAR ALL MODAL -->
+    <div *ngIf="showClearModal" class="modal-overlay" (click)="closeClearModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h3>تأكيد المسح</h3>
+        <p>هل تريد مسح جميع الكتب من المفضلة؟</p>
+        <div class="modal-actions">
+          <button class="btn-cancel" (click)="closeClearModal()">إلغاء</button>
+          <button class="btn-confirm" (click)="clearFavourites()">تأكيد</button>
+        </div>
       </div>
     </div>
-  </div>
+
+    <!-- ✅ IMAGE MODAL -->
+    <div class="modal" *ngIf="imageModalUrls && imageModalUrls.length > 0" (click)="imageModalUrls = null">
+      <div class="modal-content large" (click)="$event.stopPropagation()">
+        <button class="close-modal" (click)="imageModalUrls = null">✕</button>
+        <div class="carousel">
+          <img [src]="getImageUrl(imageModalUrls[currentImageIndex])" alt="Full-size Image" class="modal-image" />
+          <button class="carousel-btn prev" *ngIf="imageModalUrls.length > 1" (click)="prevImage()">❮</button>
+          <button class="carousel-btn next" *ngIf="imageModalUrls.length > 1" (click)="nextImage()">❯</button>
+          <div class="carousel-indicators" *ngIf="imageModalUrls.length > 1">
+            <span
+              *ngFor="let img of imageModalUrls; let i = index"
+              [class.active]="i === currentImageIndex"
+              (click)="currentImageIndex = i"></span>
+          </div>
+          <div class="image-counter">{{ currentImageIndex + 1 }} / {{ imageModalUrls.length }}</div>
+        </div>
+      </div>
+    </div>
+  </main>
 </div>

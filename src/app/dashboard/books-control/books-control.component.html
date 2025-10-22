@@ -1,0 +1,399 @@
+<div class="books-control-container">
+  <app-sidebar></app-sidebar>
+
+  <main class="books-main">
+    <header class="books-header">
+      <div class="header-content">
+        <div class="header-text">
+          <h1 class="header-title">إدارة الكتب</h1>
+          <p class="header-subtitle">إضافة، تعديل، وحذف الكتب وإدارة العروض والمخزون</p>
+        </div>
+        <button class="add-book-btn" (click)="openAddBookForm()" *ngIf="!showForm">
+          <span class="btn-icon">+</span>
+          <span>إضافة كتاب جديد</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="alert error" *ngIf="errorMessage">
+      <div class="alert-content">
+        <span class="alert-icon">⚠</span>
+        <span class="alert-text">{{ errorMessage }}</span>
+      </div>
+      <button class="close-alert" (click)="errorMessage = null">✕</button>
+    </div>
+
+    <div class="loading-overlay" *ngIf="isLoading">
+      <div class="loading-content">
+        <div class="spinner"></div>
+        <span>جارٍ التحميل...</span>
+      </div>
+    </div>
+
+    <div class="form-container" *ngIf="showForm">
+      <div class="form-header">
+        <h2>{{ editingBookId ? 'تعديل الكتاب' : 'إضافة كتاب جديد' }}</h2>
+        <button class="close-form-btn" (click)="cancelForm()">✕</button>
+      </div>
+
+      <form [formGroup]="bookForm" (ngSubmit)="submitBook()">
+        <div class="form-section">
+          <h3 class="section-title">المعلومات الأساسية</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="name">اسم الكتاب <span class="required">*</span></label>
+              <input
+                id="name"
+                formControlName="name"
+                type="text"
+                placeholder="أدخل اسم الكتاب"
+                [class.error]="bookForm.get('name')?.touched && bookForm.get('name')?.invalid" />
+              <div class="error-message" *ngIf="bookForm.get('name')?.touched && bookForm.get('name')?.invalid">
+                اسم الكتاب مطلوب
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="title">العنوان <span class="required">*</span></label>
+              <input
+                id="title"
+                formControlName="title"
+                type="text"
+                placeholder="أدخل عنوان الكتاب"
+                [class.error]="bookForm.get('title')?.touched && bookForm.get('title')?.invalid" />
+              <div class="error-message" *ngIf="bookForm.get('title')?.touched && bookForm.get('title')?.invalid">
+                العنوان مطلوب
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="category">الفئة <span class="required">*</span></label>
+              <input
+                id="category"
+                formControlName="category"
+                type="text"
+                placeholder="أدخل الفئة"
+                [class.error]="bookForm.get('category')?.touched && bookForm.get('category')?.invalid" />
+              <div class="error-message" *ngIf="bookForm.get('category')?.touched && bookForm.get('category')?.invalid">
+                الفئة مطلوبة
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="code">رمز الكتاب</label>
+              <input id="code" formControlName="code" type="text" placeholder="أدخل رمز الكتاب" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">التسعير والمخزون</h3>
+          <div class="form-grid pricing-grid">
+            <div class="form-group">
+              <label for="price">السعر (جنيه) <span class="required">*</span></label>
+              <input
+                id="price"
+                formControlName="price"
+                type="number"
+                placeholder="0.00"
+                [class.error]="bookForm.get('price')?.touched && bookForm.get('price')?.invalid" />
+              <div class="error-message" *ngIf="bookForm.get('price')?.touched && bookForm.get('price')?.invalid">
+                السعر يجب أن يكون رقمًا موجبًا
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="quantity">الكمية <span class="required">*</span></label>
+              <input
+                id="quantity"
+                formControlName="quantity"
+                type="number"
+                placeholder="0"
+                [class.error]="bookForm.get('quantity')?.touched && bookForm.get('quantity')?.invalid" />
+              <div class="error-message" *ngIf="bookForm.get('quantity')?.touched && bookForm.get('quantity')?.invalid">
+                الكمية يجب أن تكون رقمًا موجبًا
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="offer">نسبة الخصم (%)</label>
+              <input
+                id="offer"
+                formControlName="offer"
+                type="number"
+                placeholder="0"
+                [class.error]="bookForm.get('offer')?.touched && bookForm.get('offer')?.invalid" />
+              <div class="error-message" *ngIf="bookForm.get('offer')?.touched && bookForm.get('offer')?.invalid">
+                نسبة الخصم يجب أن تكون بين 0 و100
+              </div>
+            </div>
+
+            <div class="form-group price-preview" *ngIf="bookForm.get('price')?.value > 0">
+              <label>السعر بعد الخصم</label>
+              <div class="price-display">
+                <span class="final-price">{{ calculateFinalPrice() | number:'1.2-2' }} جنيه</span>
+                <span class="original-price" *ngIf="bookForm.get('offer')?.value > 0">{{ bookForm.get('price')?.value | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">الوصف</h3>
+          <div class="form-group full-width">
+            <label for="description">وصف الكتاب</label>
+            <textarea
+              id="description"
+              formControlName="description"
+              placeholder="أدخل وصفًا تفصيليًا للكتاب..."
+              rows="4"></textarea>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">صور الكتاب</h3>
+          <div class="form-group full-width">
+            <div class="file-upload-area">
+              <input
+                id="imgs"
+                type="file"
+                multiple
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                (change)="onFileChange($event)"
+                #fileInput />
+              <label for="imgs" class="file-upload-label">
+                <span class="upload-icon">📷</span>
+                <span class="upload-text">اضغط لاختيار الصور</span>
+                <span class="upload-hint">حد أقصى 5 صور (JPEG, PNG, GIF, WebP)</span>
+              </label>
+            </div>
+
+            <div class="image-preview-grid" *ngIf="selectedFiles.length > 0">
+              <div *ngFor="let file of selectedFiles; let i = index" class="preview-card">
+                <img [src]="file.preview" alt="Preview" class="preview-img" />
+                <button type="button" class="remove-img" (click)="removeImage(i)">
+                  <span>✕</span>
+                </button>
+                <div class="image-overlay">
+                  <span class="image-number">{{ i + 1 }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="error-message" *ngIf="imageError">{{ imageError }}</div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" [disabled]="isSubmitDisabled()">
+            <span>{{ editingBookId ? 'تحديث الكتاب' : 'حفظ الكتاب' }}</span>
+          </button>
+          <button type="button" class="btn-secondary" (click)="cancelForm()">إلغاء</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="books-list-section" *ngIf="!showForm">
+      <div class="section-header">
+        <h2 class="section-title-main">قائمة الكتب</h2>
+        <div class="books-count">
+          <span class="count-number">{{ filteredBooks.length }}</span>
+          <span class="count-text">كتاب</span>
+        </div>
+      </div>
+
+      <div class="filters-bar">
+        <div class="filter-item">
+          <label for="categoryFilter">الفئة</label>
+          <select id="categoryFilter" [(ngModel)]="categoryFilter" (change)="filterBooks()">
+            <option value="">جميع الفئات</option>
+            <option *ngFor="let category of uniqueCategories" [value]="category">{{ category }}</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label for="stockFilter">المخزون</label>
+          <select id="stockFilter" [(ngModel)]="stockFilter" (change)="filterBooks()">
+            <option value="">الكل</option>
+            <option value="inStock">متوفر</option>
+            <option value="outOfStock">غير متوفر</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label for="sortBy">ترتيب حسب</label>
+          <select id="sortBy" [(ngModel)]="sortBy" (change)="sortBooks()">
+            <option value="name">الاسم</option>
+            <option value="price">السعر</option>
+            <option value="quantity">الكمية</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="books-grid">
+        <div *ngFor="let book of filteredBooks" class="book-card">
+          <div class="book-image-container">
+            <div class="image-wrapper">
+              <img
+                [src]="getImageUrl(book.imgs[0])"
+                [alt]="book.name"
+                class="book-image"
+                (error)="handleImageError(-1, book._id)"
+                loading="lazy" />
+              <div class="stock-badge" [class.out-of-stock]="book.stockStatus === 'outOfStock'">
+                {{ book.stockStatus === 'inStock' ? 'متوفر' : 'غير متوفر' }}
+              </div>
+              <div class="offer-badge" *ngIf="book.offer > 0">
+                خصم {{ book.offer }}%
+              </div>
+            </div>
+            <div class="image-thumbnails-small" *ngIf="book.imgs.length > 1">
+              <div
+                *ngFor="let img of book.imgs.slice(0, 4); let i = index"
+                class="thumbnail-small"
+                (click)="openImageModal(img)">
+                <img [src]="getImageUrl(img)" [alt]="book.name" />
+              </div>
+              <div class="more-images" *ngIf="book.imgs.length > 4" (click)="openImageModal(book.imgs[0])">
+                +{{ book.imgs.length - 4 }}
+              </div>
+            </div>
+          </div>
+
+          <div class="book-content">
+            <h3 class="book-name">{{ book.name }}</h3>
+            <p class="book-title">{{ book.title }}</p>
+            <div class="book-category">{{ book.category }}</div>
+
+            <div class="book-details">
+              <div class="detail-item">
+                <span class="detail-label">الكود:</span>
+                <span class="detail-value">{{ book.code || 'غير محدد' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">الكمية:</span>
+                <span class="detail-value">{{ book.quantity }}</span>
+              </div>
+            </div>
+
+            <div class="book-price">
+              <div class="price-main">
+                <span class="current-price">{{ calculateBookFinalPrice(book) | number:'1.2-2' }}</span>
+                <span class="currency">جنيه</span>
+              </div>
+              <div class="price-original" *ngIf="book.offer > 0">
+                <span class="original-amount">{{ book.price | number:'1.2-2' }}</span>
+              </div>
+            </div>
+
+            <div class="book-description" *ngIf="book.description">
+              {{ book.description | slice:0:100 }}{{ book.description.length > 100 ? '...' : '' }}
+            </div>
+          </div>
+
+          <div class="book-actions">
+            <button class="action-btn edit" (click)="editBook(book)">
+              <span class="action-icon">✏️</span>
+              <span>تعديل</span>
+            </button>
+            <button class="action-btn delete" (click)="openDeleteModal(book._id!)">
+              <span class="action-icon">🗑️</span>
+              <span>حذف</span>
+            </button>
+            <button class="action-btn offer" (click)="openOfferModal(book._id!, book.offer)">
+              <span class="action-icon">🏷️</span>
+              <span>خصم</span>
+            </button>
+            <button class="action-btn stock" (click)="openStockModal(book._id!, book.quantity)">
+              <span class="action-icon">📦</span>
+              <span>مخزون</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="filteredBooks.length === 0">
+        <div class="empty-icon">📚</div>
+        <h3>لا توجد كتب</h3>
+        <p>لم يتم العثور على أي كتب. جرب تغيير الفلاتر أو أضف كتاباً جديداً.</p>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal" *ngIf="imageModalUrls && imageModalUrls.length > 0" (click)="imageModalUrls = null">
+    <div class="modal-content large" (click)="$event.stopPropagation()">
+      <button class="close-modal" (click)="imageModalUrls = null">✕</button>
+      <div class="carousel">
+        <img [src]="getImageUrl(imageModalUrls[currentImageIndex])" alt="Full-size Image" class="modal-image" />
+        <button class="carousel-btn prev" *ngIf="imageModalUrls.length > 1" (click)="prevImage()">❮</button>
+        <button class="carousel-btn next" *ngIf="imageModalUrls.length > 1" (click)="nextImage()">❯</button>
+        <div class="carousel-indicators" *ngIf="imageModalUrls.length > 1">
+          <span
+            *ngFor="let img of imageModalUrls; let i = index"
+            [class.active]="i === currentImageIndex"
+            (click)="currentImageIndex = i"></span>
+        </div>
+        <div class="image-counter">{{ currentImageIndex + 1 }} / {{ imageModalUrls.length }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" *ngIf="deleteModalId" (click)="deleteModalId = null">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-icon delete-icon">🗑️</div>
+      <h2>تأكيد الحذف</h2>
+      <p>هل أنت متأكد من حذف هذا الكتاب؟ لا يمكن التراجع عن هذا الإجراء.</p>
+      <div class="modal-actions">
+        <button class="modal-btn danger" (click)="confirmDelete()">حذف</button>
+        <button class="modal-btn cancel" (click)="deleteModalId = null">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" *ngIf="offerModalId" (click)="offerModalId = null">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-icon offer-icon">🏷️</div>
+      <h2>إضافة خصم</h2>
+      <div class="form-group">
+        <label for="offerInput">نسبة الخصم (%)</label>
+        <input
+          id="offerInput"
+          type="number"
+          [(ngModel)]="offerModalValue"
+          min="0"
+          max="100"
+          placeholder="أدخل نسبة الخصم" />
+        <div class="error-message" *ngIf="offerModalValue < 0 || offerModalValue > 100">
+          نسبة الخصم يجب أن تكون بين 0 و100
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn confirm" [disabled]="offerModalValue < 0 || offerModalValue > 100" (click)="confirmOffer()">حفظ</button>
+        <button class="modal-btn cancel" (click)="offerModalId = null">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" *ngIf="stockModalId" (click)="stockModalId = null">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-icon stock-icon">📦</div>
+      <h2>تحديث المخزون</h2>
+      <div class="form-group">
+        <label for="stockInput">الكمية المتوفرة</label>
+        <input
+          id="stockInput"
+          type="number"
+          [(ngModel)]="stockModalValue"
+          min="0"
+          placeholder="أدخل الكمية" />
+        <div class="error-message" *ngIf="stockModalValue < 0">
+          الكمية يجب أن تكون 0 أو أكثر
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn confirm" [disabled]="stockModalValue < 0" (click)="confirmStock()">حفظ</button>
+        <button class="modal-btn cancel" (click)="stockModalId = null">إلغاء</button>
+      </div>
+    </div>
+  </div>
+</div>

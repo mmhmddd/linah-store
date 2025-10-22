@@ -1,1 +1,168 @@
-<p>children-books works!</p>
+<div class="children-books-container">
+  <main class="books-main">
+    <header class="books-header">
+      <div class="header-content">
+        <div class="header-text">
+          <h1 class="header-title">كتب الأطفال</h1>
+          <p class="header-subtitle">تصفح مجموعتنا من كتب الأطفال الممتعة والتعليمية</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="alert error" *ngIf="errorMessage">
+      <div class="alert-content">
+        <span class="alert-icon">⚠</span>
+        <span class="alert-text">{{ errorMessage }}</span>
+      </div>
+      <button class="close-alert" (click)="errorMessage = null">✕</button>
+    </div>
+
+    <div class="books-list-section">
+      <div class="section-header">
+        <h2 class="section-title-main">قائمة الكتب</h2>
+        <div class="books-count">
+          <span class="count-number">{{ filteredBooks.length }}</span>
+          <span class="count-text">كتاب</span>
+        </div>
+      </div>
+
+      <div class="filters-bar">
+        <div class="filter-item">
+          <label for="search">بحث</label>
+          <input id="search" type="text" [(ngModel)]="searchTerm" (input)="filterBooks()" placeholder="ابحث عن كتاب...">
+        </div>
+
+        <div class="filter-item">
+          <label for="categoryFilter">الفئة</label>
+          <select id="categoryFilter" [(ngModel)]="categoryFilter" (change)="filterBooks()">
+            <option value="">الكل</option>
+            <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label for="stockFilter">المخزون</label>
+          <select id="stockFilter" [(ngModel)]="stockFilter" (change)="filterBooks()">
+            <option value="">الكل</option>
+            <option value="inStock">متوفر</option>
+            <option value="outOfStock">غير متوفر</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label for="sortBy">ترتيب حسب</label>
+          <select id="sortBy" [(ngModel)]="sortBy" (change)="sortBooks()">
+            <option value="name">الاسم</option>
+            <option value="price">السعر</option>
+            <option value="quantity">الكمية</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="books-grid">
+        <div *ngFor="let book of filteredBooks" class="book-card">
+          <div class="book-image-container">
+            <div class="image-wrapper">
+              <img
+                [src]="getImageUrl(book.imgs[0])"
+                [alt]="book.name"
+                class="book-image"
+                (error)="handleImageError(book._id || '')"
+                loading="lazy" />
+              <div class="stock-badge" [class.out-of-stock]="book.stockStatus === 'outOfStock'">
+                {{ book.stockStatus === 'inStock' ? 'متوفر' : 'غير متوفر' }}
+              </div>
+              <div class="offer-badge" *ngIf="book.offer > 0">
+                خصم {{ book.offer }}%
+              </div>
+            </div>
+            <div class="image-thumbnails-small" *ngIf="book.imgs.length > 1">
+              <div
+                *ngFor="let img of book.imgs.slice(0, 4); let i = index"
+                class="thumbnail-small"
+                (click)="openImageModal(img)">
+                <img [src]="getImageUrl(img)" [alt]="book.name" />
+              </div>
+              <div class="more-images" *ngIf="book.imgs.length > 4" (click)="openImageModal(book.imgs[0])">
+                +{{ book.imgs.length - 4 }}
+              </div>
+            </div>
+          </div>
+
+          <div class="book-content">
+            <h3 class="book-name">{{ book.name }}</h3>
+            <p class="book-title">{{ book.title }}</p>
+            <div class="book-category">{{ getCategoryEmoji(book.category) }} {{ book.category }}</div>
+
+            <div class="book-details">
+              <div class="detail-item">
+                <span class="detail-label">الكود:</span>
+                <span class="detail-value">{{ book.code || 'غير محدد' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">الكمية:</span>
+                <span class="detail-value">{{ book.quantity }}</span>
+              </div>
+            </div>
+
+            <div class="book-price">
+              <div class="price-main">
+                <span class="current-price">{{ calculateBookFinalPrice(book) | number:'1.2-2' }}</span>
+                <span class="currency">جنيه</span>
+              </div>
+              <div class="price-original" *ngIf="book.offer > 0">
+                <span class="original-amount">{{ book.price | number:'1.2-2' }}</span>
+              </div>
+            </div>
+
+<!-- Replace the book-actions section in children-books.component.html -->
+<div class="book-actions">
+  <button
+    class="action-btn cart"
+    (click)="addToCart(book)"
+    [disabled]="book.stockStatus === 'outOfStock'">
+    أضف إلى السلة
+  </button>
+
+  <!-- ✅ FIXED: Favorite Button with Toggle -->
+  <button
+    class="action-btn fav"
+    (click)="toggleFavorite(book)"
+    [class.active]="isBookFavorited(book)">
+    {{ isBookFavorited(book) ? '❤️' : '🤍' }}
+  </button>
+</div>
+
+            <div class="book-description" *ngIf="book.description">
+              {{ book.description | slice:0:80 }}{{ book.description.length > 80 ? '...' : '' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="filteredBooks.length === 0">
+        <div class="empty-icon">📚</div>
+        <h3>لا توجد كتب</h3>
+        <p>لم يتم العثور على كتب. جرب تغيير الفلاتر أو تحقق من البيانات في الخلفية.</p>
+      </div>
+    </div>
+
+    <div class="modal" *ngIf="imageModalUrls && imageModalUrls.length > 0" (click)="imageModalUrls = null">
+      <div class="modal-content large" (click)="$event.stopPropagation()">
+        <button class="close-modal" (click)="imageModalUrls = null">✕</button>
+        <div class="carousel">
+          <img [src]="getImageUrl(imageModalUrls[currentImageIndex])" alt="Full-size Image" class="modal-image" />
+          <button class="carousel-btn prev" *ngIf="imageModalUrls.length > 1" (click)="prevImage()">❮</button>
+          <button class="carousel-btn next" *ngIf="imageModalUrls.length > 1" (click)="nextImage()">❯</button>
+          <div class="carousel-indicators" *ngIf="imageModalUrls.length > 1">
+            <span
+              *ngFor="let img of imageModalUrls; let i = index"
+              [class.active]="i === currentImageIndex"
+              (click)="currentImageIndex = i"></span>
+          </div>
+          <div class="image-counter">{{ currentImageIndex + 1 }} / {{ imageModalUrls.length }}</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

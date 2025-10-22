@@ -1,9 +1,12 @@
+// login.component.ts
 import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'; // Add CommonModule
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
+import { CartService } from '../../core/services/cart.service';
+
 interface LoginFormData {
   email: string;
   password: string;
@@ -17,7 +20,7 @@ interface ValidationMessages {
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule], // Add CommonModule here
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
@@ -53,14 +56,12 @@ export class LoginComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private router: Router,
     private authService: AuthService,
+    private cartService: CartService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.loginForm = this.createForm();
   }
 
-  // Rest of the component code remains unchanged
-  // ... (ngOnInit, ngOnDestroy, createForm, etc.)
-  // Include all methods from your original login.component.ts
   ngOnInit(): void {
     this.initializeComponent();
     this.setupFormValidation();
@@ -201,6 +202,12 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.authService.login(credentials).subscribe({
         next: (response) => {
           console.log('Login successful', response);
+
+          // ✅ FIXED: Merge cart AFTER successful login
+          setTimeout(() => {
+            this.cartService.mergeCartOnLogin();
+          }, 100);
+
           resolve();
         },
         error: (error) => {

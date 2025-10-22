@@ -16,6 +16,7 @@ import { LoaderComponent } from './shared/loader-component/loader-component.comp
 export class AppComponent implements OnInit, OnDestroy {
   title = 'LinahStore';
   isLoading = false;
+  showNavbarAndFooter = true;
   private routerSubscription: Subscription | undefined;
 
   constructor(private router: Router) {}
@@ -24,7 +25,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.routerSubscription = this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         this.isLoading = true;
+        // Check if the route is related to the dashboard
+        this.showNavbarAndFooter = !event.url.includes('/dashboard');
       } else if (event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError) {
+        // Update showNavbarAndFooter on navigation end to ensure it reflects the current route
+        this.showNavbarAndFooter = !event.url.includes('/dashboard');
         setTimeout(() => {
           this.isLoading = false;
         }, 1500);

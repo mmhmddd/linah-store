@@ -1,0 +1,274 @@
+<app-sidebar></app-sidebar>
+<div class="orders-dashboard">
+  <main class="orders-main">
+    <!-- HEADER WITH SEARCH -->
+    <header class="dashboard-header">
+      <div class="header-top">
+        <div class="header-left">
+          <h1 class="header-title">إدارة الطلبات</h1>
+          <p class="header-subtitle">{{ filteredOrders.length }} من {{ totalOrders }} طلب</p>
+        </div>
+        <div class="header-search">
+          <div class="search-wrapper">
+            <i class="fas fa-search"></i>
+            <input
+              type="text"
+              [(ngModel)]="searchTerm"
+              (input)="filterOrders()"
+              placeholder="ابحث بالاسم أو رقم الطلب..."
+              class="search-input">
+          </div>
+        </div>
+      </div>
+
+      <!-- STATUS STATS -->
+      <div class="stats-bar">
+        <div class="stat-item" *ngFor="let stat of getStatusStats()">
+          <div class="stat-icon" [style.background-color]="getStatusColor(stat.status)">
+            {{ getStatusIcon(stat.status) }}
+          </div>
+          <span class="stat-label">{{ getStatusLabel(stat.status) }}</span>
+          <span class="stat-number">{{ stat.count }}</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- FILTERS -->
+    <div class="filters-panel">
+      <div class="filters-header">
+        <h3><i class="fas fa-filter"></i> فلاتر البحث</h3>
+        <button class="btn-clear" (click)="clearFilters()">
+          <i class="fas fa-times"></i> مسح
+        </button>
+      </div>
+
+      <div class="filters-content">
+        <div class="filter-row">
+          <div class="filter-group">
+            <label>حالة الطلب</label>
+            <select [(ngModel)]="statusFilter" (change)="filterOrders()">
+              <option value="">الكل</option>
+              <option *ngFor="let option of statusOptions" [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>التاريخ</label>
+            <select [(ngModel)]="dateFilter" (change)="filterOrders()">
+              <option value="">الكل الأوقات</option>
+              <option *ngFor="let option of dateOptions" [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>طريقة الدفع</label>
+            <select [(ngModel)]="paymentFilter" (change)="filterOrders()">
+              <option value="">الكل</option>
+              <option value="cash">كاش عند الاستلام</option>
+              <option value="visa">فيزا</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>المحافظة</label>
+            <select [(ngModel)]="governmentFilter" (change)="filterOrders()">
+              <option value="">الكل</option>
+              <option value="القاهرة">القاهرة</option>
+              <option value="الجيزة">الجيزة</option>
+              <option value="الإسكندرية">الإسكندرية</option>
+              <option value="الدقهلية">الدقهلية</option>
+              <option value="أخرى">أخرى</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDERS TABLE -->
+    <div class="orders-table-container">
+      <div class="table-header">
+        <h3>قائمة الطلبات</h3>
+        <button class="btn-refresh" (click)="loadOrders()">
+          <i class="fas fa-sync-alt"></i> تحديث
+        </button>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div *ngIf="filteredOrders.length === 0" class="empty-state">
+        <div class="empty-icon">📦</div>
+        <h3>لا توجد طلبات</h3>
+        <p>لم يتم العثور على طلبات مطابقة للفلتر</p>
+        <div class="empty-actions">
+          <button class="btn-primary" (click)="loadOrders()">إعادة التحميل</button>
+          <button class="btn-secondary" (click)="clearFilters()">مسح الفلاتر</button>
+        </div>
+      </div>
+
+      <!-- ORDERS TABLE -->
+      <div class="orders-table" *ngIf="filteredOrders.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>رقم الطلب</th>
+              <th>العميل</th>
+              <th>المحافظة</th>
+              <th>المنتجات</th>
+              <th>المجموع</th>
+              <th>الحالة</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of filteredOrders">
+              <td class="order-id">#{{ order._id.substring(order._id.length - 6) }}</td>
+              <td class="customer-name">{{ order.fullName }}</td>
+              <td class="government">{{ order.government }}</td>
+              <td class="items-count">{{ order.items.length }} منتج</td>
+              <td class="total-amount">{{ order.totalAmount | number:'1.0-0' }} ج.م</td>
+              <td class="status-cell">
+                <span class="status-badge" [ngClass]="'status-' + order.status.replace(' ', '-')">
+                  {{ getStatusIcon(order.status) }} {{ getStatusLabel(order.status) }}
+                </span>
+              </td>
+              <td class="actions-cell">
+                <div class="action-buttons">
+                  <!-- ✅ FIXED STATUS SELECT - READONLY DISPLAY -->
+                  <select
+                    [value]="order.status"
+                    [disabled]="order.status === 'مسلم'"
+                    (change)="handleStatusChange(order, $event)"
+                    class="status-select">
+                    <option *ngFor="let option of getAvailableStatuses(order.status)" [value]="option">
+                      {{ option }}
+                    </option>
+                  </select>
+
+                  <button class="btn-edit" (click)="openEditModal(order)" title="تحرير">
+                    <i class="fas fa-edit"></i>
+                  </button>
+
+                  <button
+                    class="btn-danger"
+                    (click)="confirmDelete(order._id, order.fullName)"
+                    [disabled]="order.status === 'مسلم'"
+                    title="حذف">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="quick-actions" *ngIf="filteredOrders.length > 0">
+      <button class="btn-primary" (click)="exportOrders()">
+        <i class="fas fa-download"></i> تصدير إلى Excel
+      </button>
+      <span class="results-count">{{ filteredOrders.length }} نتيجة معروضة</span>
+    </div>
+
+    <!-- ✅ FIXED CONFIRMATION MODAL -->
+    <div class="confirm-modal" *ngIf="showConfirmModal">
+      <div class="modal-overlay" (click)="closeConfirmModal()"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-icon" [ngClass]="confirmType">
+            <i *ngIf="confirmType === 'delete'" class="fas fa-trash"></i>
+            <i *ngIf="confirmType === 'status'" class="fas fa-exclamation-triangle"></i>
+            <i *ngIf="confirmType === 'success'" class="fas fa-check-circle"></i>
+            <i *ngIf="confirmType === 'error'" class="fas fa-exclamation-circle"></i>
+          </div>
+          <h3>{{ confirmTitle }}</h3>
+        </div>
+        <div class="modal-body">
+          <p>{{ confirmMessage }}</p>
+          <div class="highlight-box" *ngIf="confirmOrderName">{{ confirmOrderName }}</div>
+        </div>
+        <div class="modal-actions">
+          <!-- Show Cancel only for delete/status -->
+          <button *ngIf="confirmType === 'delete' || confirmType === 'status'"
+                  class="btn-secondary"
+                  (click)="closeConfirmModal()">
+            إلغاء
+          </button>
+
+          <!-- Show Confirm only for delete/status -->
+          <button *ngIf="confirmType === 'delete' || confirmType === 'status'"
+                  class="btn-primary"
+                  [ngClass]="{'btn-danger': confirmType === 'delete'}"
+                  (click)="executeConfirmAction()">
+            {{ confirmButtonText }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div class="modal" *ngIf="showEditModal">
+      <div class="modal-overlay" (click)="closeEditModal()"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>تحرير الطلب #{{ getOrderId() }}</h3>
+          <button class="modal-close" (click)="closeEditModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <form (ngSubmit)="saveOrder()" #editForm="ngForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>الاسم الكامل</label>
+              <input [(ngModel)]="editingOrder!.fullName" name="fullName" required class="form-input">
+            </div>
+
+            <div class="form-group">
+              <label>المحافظة</label>
+              <select [(ngModel)]="editingOrder!.government" name="government" required class="form-input">
+                <option value="القاهرة">القاهرة</option>
+                <option value="الجيزة">الجيزة</option>
+                <option value="الإسكندرية">الإسكندرية</option>
+                <option value="الدقهلية">الدقهلية</option>
+                <option value="أخرى">أخرى</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>العنوان</label>
+              <textarea [(ngModel)]="editingOrder!.address" name="address" rows="3" required class="form-input"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>طريقة الدفع</label>
+              <select [(ngModel)]="editingOrder!.paymentMethod" name="paymentMethod" required class="form-input">
+                <option value="cash">كاش عند الاستلام</option>
+                <option value="visa">فيزا</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>كود الخصم</label>
+              <input [(ngModel)]="editingOrder!.saleCode" name="saleCode" class="form-input">
+            </div>
+
+            <div class="form-group full-width">
+              <label>ملاحظات</label>
+              <textarea [(ngModel)]="editingOrder!.notes" name="notes" rows="3" class="form-input"></textarea>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" (click)="closeEditModal()">إلغاء</button>
+            <button type="submit" class="btn-primary" [disabled]="!editForm.valid">حفظ التغييرات</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,68 @@
+<!-- dashboard.component.html -->
+<div class="dashboard-container">
+  <app-sidebar></app-sidebar>
+  <main class="dashboard-main">
+    <header class="dashboard-header">
+      <h1 class="header-title">لوحة التحكم</h1>
+      <p class="header-subtitle">إدارة الكتب، الطلبات، والإيرادات بسهولة</p>
+    </header>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p>جاري تحميل البيانات...</p>
+    </div>
+
+    <!-- 3 DYNAMIC CARDS -->
+    <section *ngIf="!loading" class="overview-section">
+      <div class="overview-grid">
+
+        <!-- 📚 BOOKS -->
+        <div class="overview-card">
+          <span class="card-icon">📚</span>
+          <h3 class="card-title">الكتب</h3>
+          <p class="card-value">{{ formatNumber(stats.totalBooks) }}</p>
+          <p class="card-label">كتب متوفرة</p>
+        </div>
+
+        <!-- 🛒 ORDERS -->
+        <div class="overview-card">
+          <span class="card-icon">🛒</span>
+          <h3 class="card-title">الطلبات</h3>
+          <p class="card-value">{{ formatNumber(stats.totalOrders) }}</p>
+          <p class="card-label">طلبات جديدة</p>
+        </div>
+
+        <!-- 💰 REVENUE -->
+        <div class="overview-card">
+          <span class="card-icon">💰</span>
+          <h3 class="card-title">الإيرادات</h3>
+          <p class="card-value">{{ formatCurrency(stats.todayRevenue) }}</p>
+          <p class="card-label">إجمالي الإيرادات مؤكدة</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 2 Control Cards -->
+    <section class="control-section">
+      <h2 class="section-title">أقسام التحكم</h2>
+      <div class="control-grid">
+        <a routerLink="/books-control" class="control-card">
+          <div class="card-content">
+            <span class="card-icon">📚</span>
+            <h3 class="card-title">إدارة الكتب</h3>
+            <p class="card-description">إضافة، تعديل، وحذف الكتب وإدارة المخزون</p>
+          </div>
+        </a>
+        <a routerLink="/orders-control" class="control-card">
+          <div class="card-content">
+            <span class="card-icon">🛒</span>
+            <h3 class="card-title">إدارة الطلبات</h3>
+            <p class="card-description">تتبع الطلبات، إدارة الشحنات والإرجاعات</p>
+          </div>
+        </a>
+      </div>
+    </section>
+  </main>
+</div>

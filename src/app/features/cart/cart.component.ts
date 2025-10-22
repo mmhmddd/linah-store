@@ -1,17 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+// cart.component.ts
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
-interface CartItem {
-  id: number;
-  title: string;
-  price: number;
-  quantity: number;
-  image: string;
-  category: string;
-  description: string;
-  rating: number;
-}
+import { environment } from '../../../environments/environment';
+import { CartItem, CartService } from '../../core/services/cart.service';
+import { OrderService, Order } from '../../core/services/order.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-cart',
@@ -20,93 +16,88 @@ interface CartItem {
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.scss']
 })
-export class CartComponent implements OnInit {
+export class CartComponent implements OnInit, OnDestroy {
   cartItems: CartItem[] = [];
   step: number = 1;
   shippingInfo = {
-    governorate: '',
-    name: '',
+    government: '',
+    fullName: '',
     address: '',
+    paymentMethod: 'cash' as 'cash' | 'visa',
+    saleCode: '',
     notes: ''
   };
-  couponCode: string = '';
   discount: number = 0;
   governorates: string[] = [
-    'القاهرة',
-    'الجيزة',
-    'الإسكندرية',
-    'الدقهلية',
-    'البحر الأحمر',
-    'البحيرة',
-    'الفيوم',
-    'الغربية',
-    'الإسماعيلية',
-    'المنوفية',
-    'المنيا',
-    'القليوبية',
-    'الأقصر',
-    'أسوان',
-    'أسيوط',
-    'بني سويف',
-    'بورسعيد',
-    'دمياط',
-    'السويس',
-    'الشرقية',
-    'كفر الشيخ',
-    'مطروح',
-    'قنا',
-    'شمال سيناء',
-    'جنوب سيناء',
-    'سوهاج'
+    'القاهرة', 'الجيزة', 'الإسكندرية', 'الدقهلية', 'البحر الأحمر', 'البحيرة', 'الفيوم',
+    'الغربية', 'الإسماعيلية', 'المنوفية', 'المنيا', 'القليوبية', 'الأقصر', 'أسوان',
+    'أسيوط', 'بني سويف', 'بورسعيد', 'دمياط', 'السويس', 'الشرقية', 'كفر الشيخ',
+    'مطروح', 'قنا', 'شمال سيناء', 'جنوب سيناء', 'سوهاج'
   ];
+  fallbackImage: string = '/assets/images/fallback.jpg';
+
+  private cartSubscription?: Subscription;
+  private authReadySubscription?: Subscription;
+
+  constructor(
+    private cartService: CartService,
+    private orderService: OrderService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
-    this.cartItems = [
-      {
-        id: 1,
-        title: 'مغامرات في الغابة السحرية',
-        price: 200.00,
-        quantity: 1,
-        image: '/assets/images/home/book1.jpg',
-        category: 'مغامرات',
-        description: 'انطلق في رحلة مثيرة مع الأصدقاء في الغابة المليئة بالأسرار',
-        rating: 5
-      },
-      {
-        id: 2,
-        title: 'أسرار القلعة القديمة',
-        price: 150.00,
-        quantity: 1,
-        image: '/assets/images/home/book2.jpg',
-        category: 'غموض',
-        description: 'استكشف أسرار قلعة قديمة مليئة بالألغاز والمفاجآت',
-        rating: 4
-      },
-      {
-        id: 3,
-        title: 'رحلة إلى المجهول',
-        price: 180.00,
-        quantity: 1,
-        image: '/assets/images/home/book3.jpg',
-        category: 'مغامرات',
-        description: 'رحلة ملحمية عبر عوالم غريبة ومثيرة',
-        rating: 5
-      },
-      {
-        id: 4,
-        title: 'حكايات من الزمن الجميل',
-        price: 120.00,
-        quantity: 1,
-        image: '/assets/images/home/book4.jpg',
-        category: 'روايات',
-        description: 'مجموعة قصص تأخذك إلى أيام الزمن الجميل',
-        rating: 3
-      }
-    ];
+    console.log('🛒 CART COMPONENT - ngOnInit STARTED');
+
+    this.cartSubscription = this.cartService.cartItems$.subscribe(items => {
+      console.log('🛒 Cart items updated:', items.length, 'items');
+      this.cartItems = items;
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.cartSubscription) {
+      this.cartSubscription.unsubscribe();
+    }
+    if (this.authReadySubscription) {
+      this.authReadySubscription.unsubscribe();
+    }
+  }
+
+  getImageUrl(img: string): string {
+    if (!img) {
+      console.warn('No image provided, using fallback');
+      return this.fallbackImage;
+    }
+    if (img.startsWith('http://') || img.startsWith('https://')) {
+      return img;
+    }
+    const baseUrl = environment.apiUrl.replace('/api', '');
+    if (img.startsWith('/uploads')) {
+      return `${baseUrl}${img}`;
+    }
+    if (!img.startsWith('/')) {
+      return `${baseUrl}/uploads/${img}`;
+    }
+    return `${baseUrl}${img}`;
+  }
+
+  getCategoryEmoji(category: string): string {
+    const emojiMap: { [key: string]: string } = {
+      'خيال': '🌊',
+      'مغامرات': '🚀',
+      'علوم': '🔬',
+      'قصص': '📖',
+      'تعليمي': '🎓',
+      'فنون': '🎨'
+    };
+    return emojiMap[category] || '📚';
   }
 
   getSubtotal(): number {
-    return this.cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return this.cartItems.reduce((total, item) => {
+      const discountedPrice = item.book.price - (item.book.price * (item.book.offer / 100));
+      return total + (discountedPrice * item.quantity);
+    }, 0);
   }
 
   getTotalPrice(): number {
@@ -114,19 +105,28 @@ export class CartComponent implements OnInit {
   }
 
   updateQuantity(item: CartItem, change: number) {
-    item.quantity = Math.max(1, item.quantity + change);
+    const newQuantity = Math.max(1, item.quantity + change);
+    this.cartService.updateQuantity(item.book._id, newQuantity).subscribe({
+      error: (err) => alert('فشل في تحديث الكمية: ' + err.message)
+    });
   }
 
-  removeFromCart(itemId: number) {
-    this.cartItems = this.cartItems.filter(item => item.id !== itemId);
-    if (this.cartItems.length === 0) {
-      this.step = 1;
-    }
+  removeFromCart(bookId: string) {
+    this.cartService.removeFromCart(bookId).subscribe({
+      next: () => {
+        if (this.cartItems.length === 0) {
+          this.step = 1;
+          this.discount = 0;
+          this.shippingInfo.saleCode = '';
+        }
+      },
+      error: (err) => alert('فشل في إزالة العنصر: ' + err.message)
+    });
   }
 
   applyCoupon() {
-    if (this.couponCode === 'DISCOUNT10') {
-      this.discount = this.getSubtotal() * 0.1; // 10% discount
+    if (this.shippingInfo.saleCode === 'DISCOUNT10') {
+      this.discount = this.getSubtotal() * 0.1;
     } else {
       this.discount = 0;
       alert('كوبون غير صالح');
@@ -134,7 +134,7 @@ export class CartComponent implements OnInit {
   }
 
   nextStep() {
-    if (this.step < 2) {
+    if (this.step < 2 && this.cartItems.length > 0) {
       this.step++;
     }
   }
@@ -146,37 +146,43 @@ export class CartComponent implements OnInit {
   }
 
   submitShipping() {
-    if (this.shippingInfo.governorate && this.shippingInfo.name && this.shippingInfo.address) {
-      console.log('Order submitted:', {
-        cartItems: this.cartItems,
-        shippingInfo: this.shippingInfo,
-        totalPrice: this.getTotalPrice()
+    if (this.shippingInfo.government &&
+        this.shippingInfo.fullName &&
+        this.shippingInfo.address &&
+        this.shippingInfo.paymentMethod) {
+
+      this.orderService.createOrder({
+        government: this.shippingInfo.government,
+        fullName: this.shippingInfo.fullName,
+        address: this.shippingInfo.address,
+        paymentMethod: this.shippingInfo.paymentMethod,
+        saleCode: this.shippingInfo.saleCode || undefined,
+        notes: this.shippingInfo.notes || undefined
+      }).subscribe({
+        next: (order: Order) => {
+          alert('تم تأكيد الطلب بنجاح!');
+          this.cartService.clearCart().subscribe(() => {
+            this.resetForm();
+          });
+        },
+        error: (err) => alert('فشل في إنشاء الطلب: ' + err.message)
       });
-      alert('تم تأكيد الطلب بنجاح!');
-      this.cartItems = [];
-      this.shippingInfo = { governorate: '', name: '', address: '', notes: '' };
-      this.couponCode = '';
-      this.discount = 0;
-      this.step = 1;
+    } else {
+      alert('يرجى ملء جميع الحقول المطلوبة');
     }
   }
 
-  addToCart(title: string) {
-    const existingItem = this.cartItems.find(item => item.title === title);
-    if (existingItem) {
-      this.updateQuantity(existingItem, 1);
-    } else {
-      this.cartItems.push({
-        id: this.cartItems.length + 1,
-        title,
-        price: 200.00,
-        quantity: 1,
-        image: '/assets/images/home/book5.jpg',
-        category: 'مغامرات',
-        description: 'انطلق في رحلة مثيرة مع الأصدقاء في الغابة المليئة بالأسرار',
-        rating: 5
-      });
-    }
+  private resetForm(): void {
+    this.shippingInfo = {
+      government: '',
+      fullName: '',
+      address: '',
+      paymentMethod: 'cash',
+      saleCode: '',
+      notes: ''
+    };
+    this.discount = 0;
+    this.step = 1;
   }
 
   scrollToOrderSummary(): void {

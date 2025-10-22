@@ -1,404 +1,315 @@
-// Color Variables (Updated for modern aesthetic)
-$color-white: #ffffff;
-$color-shadow-light: rgba(0, 0, 0, 0.08);
-$color-shadow-dark: rgba(0, 0, 0, 0.15);
-$color-accent-yellow: #facc15;
-$color-primary: #1e3a8a;
-$color-text: #1f2937;
-$color-success: #10b981;
-$color-warning: #f59e0b;
-$color-danger: #ef4444;
-$color-background: #f8fafc;
-$color-cart: #3b82f6; // New color for cart button
-
-// Breakpoints
-$bp-mobile: 576px;
-$bp-tablet: 768px;
-$bp-desktop: 992px;
-
-// Mixins
-@mixin button-base {
-  padding: 0.75rem 1.25rem;
-  font-size: clamp(0.875rem, 1.5vw, 0.9375rem);
-  font-weight: 500;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-@mixin hover-scale {
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-}
-
+// features/favourite/favourite.component.scss
 .favourite-container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-  direction: rtl;
-  min-height: 100vh;
+  .books-main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    direction: rtl;
 
-  @media (min-width: $bp-tablet) {
-    padding: 3rem 2rem;
-  }
-
-  .favourite-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-
-    .favourite-title {
-      font-size: clamp(1.75rem, 4vw, 2rem);
-      font-weight: 700;
-      color: $color-primary;
-      position: relative;
-      padding-bottom: 0.5rem;
-
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        width: 80px;
-        height: 4px;
-        background: linear-gradient(to left, $color-accent-yellow, $color-warning);
-        border-radius: 4px;
-      }
-    }
-
-    .clear-favourites {
-      @include button-base;
-      background: $color-danger;
-      color: $color-white;
-      padding: 0.5rem 1rem;
-      font-size: clamp(0.75rem, 1.5vw, 0.875rem);
-
-      @include hover-scale;
-    }
-  }
-
-  .favourite-items {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 2rem;
-    margin-bottom: 2rem;
-
-    @media (max-width: $bp-mobile) {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-
-    .book-card {
-      background: $color-white;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 4px 16px $color-shadow-light;
-      transition: transform 0.3s, box-shadow 0.3s;
-      display: flex;
-      flex-direction: column;
-
-      &:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 8px 24px $color-shadow-dark;
-
-        .book-card-image {
-          transform: scale(1.02);
-        }
-
-        .book-title {
-          color: $color-accent-yellow;
-        }
-      }
-
-      .book-card-image {
-        width: 100%;
-        height: 220px;
-        background-size: cover;
-        background-position: center;
-        position: relative;
-        transition: transform 0.4s ease;
-
-        @media (max-width: $bp-mobile) {
-          height: 180px;
-        }
-
-        .book-rating {
-          position: absolute;
-          top: 12px;
-          right: 12px;
-          display: flex;
-          gap: 0.25rem;
-          background: rgba($color-white, 0.9);
-          padding: 0.25rem 0.5rem;
-          border-radius: 8px;
-
-          .star {
-            font-size: clamp(0.75rem, 1.5vw, 0.875rem);
-            color: $color-accent-yellow;
-          }
-        }
-      }
-
-      .book-content {
-        padding: 1.5rem;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-
-        .book-category-badge {
-          background: $color-success;
-          color: $color-white;
-          padding: 0.4rem 0.8rem;
-          border-radius: 20px;
-          font-size: clamp(0.75rem, 1.5vw, 0.8125rem);
-          font-weight: 600;
-          align-self: flex-end;
-          margin-bottom: 0.75rem;
-        }
-
-        .book-title {
-          font-size: clamp(1.125rem, 2.5vw, 1.25rem);
-          font-weight: 600;
-          color: $color-text;
-          margin-bottom: 0.75rem;
-          line-height: 1.4;
-          text-align: right;
-        }
-
-        .book-description {
-          font-size: clamp(0.8125rem, 1.5vw, 0.875rem);
-          color: $color-text;
-          opacity: 0.8;
-          margin-bottom: 1rem;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-          text-align: right;
-        }
-
-        .book-footer {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-
-          .book-price-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-
-            .book-price {
-              font-size: clamp(1rem, 2vw, 1.125rem);
-              font-weight: 600;
-              color: $color-warning;
-            }
-
-            .price-badge {
-              background: $color-danger;
-              color: $color-white;
-              padding: 0.3rem 0.6rem;
-              border-radius: 12px;
-              font-size: clamp(0.625rem, 1.2vw, 0.75rem);
-            }
-          }
-
-          .button-group {
-            display: flex;
-            gap: 0.5rem;
-          }
-
-          .favourite-button,
-          .cart-button {
-            @include button-base;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: $color-white;
-            border: 2px solid $color-accent-yellow;
-            color: $color-primary;
-            position: relative;
-
-            &.active {
-              background: $color-danger;
-              color: $color-white;
-              border-color: $color-danger;
-
-              .fa-heart,
-              .fa-shopping-cart {
-                animation: heartbeat 0.4s ease-in-out;
-              }
-            }
-
-            &.cart-button {
-              border-color: $color-cart;
-              &.active {
-                background: $color-cart;
-                border-color: $color-cart;
-              }
-            }
-
-            @include hover-scale;
-
-            .fa-heart,
-            .fa-shopping-cart {
-              font-size: clamp(0.875rem, 1.5vw, 1rem);
-            }
-
-            .button-tooltip {
-              position: absolute;
-              bottom: 100%;
-              right: 50%;
-              transform: translateX(50%);
-              background: $color-primary;
-              color: $color-white;
-              padding: 0.4rem 0.8rem;
-              border-radius: 8px;
-              font-size: clamp(0.625rem, 1.2vw, 0.75rem);
-              opacity: 0;
-              visibility: hidden;
-              transition: all 0.3s ease;
-              white-space: nowrap;
-              margin-bottom: 0.5rem;
-
-              &:after {
-                content: '';
-                position: absolute;
-                top: 100%;
-                right: 50%;
-                transform: translateX(50%);
-                border: 5px solid transparent;
-                border-top-color: $color-primary;
-              }
-            }
-
-            &:hover .button-tooltip {
-              opacity: 1;
-              visibility: visible;
-              transform: translateX(50%) translateY(-4px);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  .empty-state {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 60vh;
-
-    .empty-state-content {
-      background: $color-white;
-      padding: 2.5rem;
-      border-radius: 16px;
-      box-shadow: 0 4px 16px $color-shadow-light;
+    .books-header {
+      margin-bottom: 2rem;
       text-align: center;
-      max-width: 450px;
 
-      .empty-icon {
-        font-size: 3.5rem;
-        color: $color-danger;
-        margin-bottom: 1.5rem;
+      .header-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 0.5rem;
       }
 
-      .empty-title {
-        font-size: clamp(1.25rem, 2.5vw, 1.5rem);
-        font-weight: 600;
-        color: $color-primary;
-        margin-bottom: 0.75rem;
-      }
-
-      .empty-description {
-        font-size: clamp(0.875rem, 1.5vw, 1rem);
-        color: $color-text;
-        opacity: 0.8;
-        margin-bottom: 1.5rem;
-      }
-
-      .explore-button {
-        @include button-base;
-        background: $color-success;
-        color: $color-white;
-        width: 100%;
-        padding: 0.75rem;
-
-        @include hover-scale;
+      .header-subtitle {
+        font-size: 1.125rem;
+        color: #6b7280;
       }
     }
-  }
 
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba($color-text, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+    .books-list-section {
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+
+        .section-title-main {
+          font-size: 1.75rem;
+          font-weight: 600;
+          color: #1e3a8a;
+        }
+
+        .books-count {
+          .count-number { font-weight: 700; color: #1e3a8a; }
+          .count-text { color: #6b7280; }
+        }
+      }
+
+      .favourite-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+
+        @media (max-width: 768px) {
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+          gap: 1.5rem;
+        }
+      }
+
+      .book-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .book-image-container {
+          position: relative;
+
+          .image-wrapper {
+            position: relative;
+            overflow: hidden;
+
+            .book-image {
+              width: 100%;
+              height: 200px;
+              object-fit: cover;
+            }
+
+            .stock-badge {
+              position: absolute;
+              top: 8px;
+              left: 8px;
+              background: #10b981;
+              color: white;
+              padding: 4px 8px;
+              border-radius: 12px;
+              font-size: 0.75rem;
+              font-weight: 500;
+
+              &.out-of-stock {
+                background: #ef4444;
+              }
+            }
+
+            .offer-badge {
+              position: absolute;
+              top: 8px;
+              right: 8px;
+              background: #f59e0b;
+              color: white;
+              padding: 4px 8px;
+              border-radius: 12px;
+              font-size: 0.75rem;
+              font-weight: 500;
+            }
+          }
+
+          .image-thumbnails-small {
+            display: flex;
+            gap: 4px;
+            padding: 8px;
+            background: #f8fafc;
+
+            .thumbnail-small {
+              flex: 1;
+              cursor: pointer;
+              img { width: 100%; height: 40px; object-fit: cover; border-radius: 4px; }
+            }
+
+            .more-images {
+              background: #e5e7eb;
+              color: #6b7280;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border-radius: 4px;
+              cursor: pointer;
+              font-size: 0.875rem;
+            }
+          }
+        }
+
+        .book-content {
+          padding: 1.25rem;
+
+          .book-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+          }
+
+          .book-title {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 0.75rem;
+          }
+
+          .book-category {
+            color: #10b981;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+          }
+
+          .book-details {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+
+            .detail-item {
+              display: flex;
+              flex-direction: column;
+              font-size: 0.8125rem;
+
+              .detail-label { color: #6b7280; }
+              .detail-value { font-weight: 500; color: #1f2937; }
+            }
+          }
+
+          .book-price {
+            margin-bottom: 1rem;
+
+            .price-main {
+              display: flex;
+              align-items: baseline;
+              gap: 0.25rem;
+
+              .current-price {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: #f59e0b;
+              }
+
+              .currency { font-size: 0.875rem; color: #6b7280; }
+            }
+
+            .price-original {
+              .original-amount {
+                text-decoration: line-through;
+                color: #9ca3af;
+                font-size: 0.875rem;
+              }
+            }
+          }
+
+          .book-actions {
+            margin-bottom: 1rem;
+
+            .action-btn {
+              width: 100%;
+              padding: 12px;
+              border: none;
+              border-radius: 8px;
+              font-weight: 600;
+              cursor: pointer;
+              transition: all 0.3s;
+
+              &.cart {
+                background: #3b82f6;
+                color: white;
+
+                &.active {
+                  background: #10b981;
+                }
+
+                &:hover:not(:disabled) { background: #2563eb; }
+              }
+            }
+          }
+
+          .remove-fav-btn {
+            width: 100%;
+            padding: 10px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+
+            &:hover { background: #dc2626; }
+          }
+
+          .book-description {
+            font-size: 0.875rem;
+            color: #6b7280;
+            line-height: 1.5;
+          }
+        }
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+
+        .empty-icon { font-size: 4rem; margin-bottom: 1rem; }
+        h3 { font-size: 1.5rem; font-weight: 600; color: #1e3a8a; margin-bottom: 0.5rem; }
+        p { color: #6b7280; margin-bottom: 2rem; }
+        .explore-btn {
+          background: #10b981;
+          color: white;
+          padding: 12px 24px;
+          border: none;
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+        }
+      }
+    }
+
+    // ✅ MODALS (Exact same as children-books)
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+
+      .modal {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+
+        .modal-actions {
+          display: flex;
+          gap: 1rem;
+          margin-top: 1.5rem;
+
+          .btn-cancel { flex: 1; padding: 10px; background: #e5e7eb; border: none; border-radius: 8px; }
+          .btn-confirm { flex: 1; padding: 10px; background: #ef4444; color: white; border: none; border-radius: 8px; }
+        }
+      }
+    }
 
     .modal {
-      background: $color-white;
-      border-radius: 16px;
-      padding: 2rem;
-      max-width: 420px;
-      width: 90%;
-      box-shadow: 0 8px 24px $color-shadow-dark;
-      text-align: right;
+      &.large {
+        .modal-content {
+          max-width: 90vw;
+          max-height: 90vh;
 
-      .modal-title {
-        font-size: clamp(1.25rem, 2.5vw, 1.5rem);
-        font-weight: 600;
-        color: $color-primary;
-        margin-bottom: 1rem;
-      }
-
-      .modal-description {
-        font-size: clamp(0.875rem, 1.5vw, 1rem);
-        color: $color-text;
-        margin-bottom: 1.5rem;
-      }
-
-      .modal-actions {
-        display: flex;
-        gap: 1rem;
-
-        .action-button {
-          @include button-base;
-          flex: 1;
-          padding: 0.75rem;
-
-          &.cancel-button {
-            background: #e5e7eb;
-            color: $color-text;
-
-            @include hover-scale;
-          }
-
-          &.confirm-button {
-            background: $color-danger;
-            color: $color-white;
-
-            @include hover-scale;
+          .carousel {
+            position: relative;
+            .modal-image { max-width: 100%; max-height: 70vh; }
+            .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; padding: 10px; cursor: pointer; }
+            .prev { left: 10px; }
+            .next { right: 10px; }
+            .carousel-indicators { display: flex; justify-content: center; gap: 8px; margin-top: 1rem; }
+            .image-counter { text-align: center; margin-top: 1rem; color: #6b7280; }
           }
         }
       }
     }
-  }
-
-  @keyframes heartbeat {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.3); }
-    100% { transform: scale(1); }
   }
 }
