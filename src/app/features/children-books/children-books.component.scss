@@ -1,27 +1,47 @@
-$primary: #26735D;
-$primary-light: #33906F;
-$primary-dark: #1F5D4A;
-$accent: #FFD700;
-$danger: #EF4444;
-$danger-hover: #DC2626;
-$success: #10B981;
-$warning: #F59E0B;
-$info: #3B82F6;
-$text-dark: #1F2937;
-$text-gray: #6B7280;
-$text-light: #9CA3AF;
+$primary-bg: #26735D;
+$primary-brand: #26735D;
+$accent-yellow: #FFD700;
+$bright-orange: #FF6B35;
+$fun-purple: #8A2BE2;
+$happy-pink: #FF69B4;
+$sky-blue: #00BFFF;
+$grass-green: #32CD32;
+$text-primary: #FFFFFF;
+$text-dark: #2C3E50;
 $white: #FFFFFF;
-$bg-gray: #F9FAFB;
-$bg-light: #F3F4F6;
-$border: #E5E7EB;
-$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-$shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+$shadow-light: rgba(255, 255, 255, 0.3);
+$shadow-medium: rgba(0, 0, 0, 0.15);
+$shadow-dark: rgba(0, 0, 0, 0.2);
+$gradient-magical: linear-gradient(135deg, $bright-orange, $happy-pink, $fun-purple, $sky-blue);
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(3deg); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(1deg); }
+  75% { transform: rotate(-1deg); }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0.5; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 :host {
-  font-family: 'Tajawal', 'Cairo', sans-serif;
+  font-family: 'Tajawal', sans-serif;
   direction: rtl;
   display: block;
 }
@@ -31,791 +51,878 @@ $shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
 .children-books-container {
-  display: flex;
-  min-height: 100vh;
-  background: $bg-gray;
-}
-
-.books-main {
-  flex: 1;
-  padding: 2rem;
-  overflow-y: auto;
-  max-width: 1600px;
-  margin-left: auto;
-  margin-right: auto;
-
-  @media (max-width: 1024px) {
-    padding: 1.5rem;
-  }
-
-  @media (max-width: 640px) {
-    padding: 1rem;
-  }
-}
-
-.books-header {
-  margin-bottom: 1.5rem;
-
-  .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .header-text {
-    flex: 1;
-  }
-
-  .header-title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: $text-dark;
-    margin: 0 0 0.25rem 0;
-    line-height: 1.2;
-
-    @media (max-width: 640px) {
-      font-size: 1.25rem;
-    }
-  }
-
-  .header-subtitle {
-    font-size: 0.875rem;
-    color: $text-gray;
-    margin: 0;
-    line-height: 1.5;
-
-    @media (max-width: 640px) {
-      font-size: 0.75rem;
-    }
-  }
-}
-
-.alert {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.25rem;
-  margin-bottom: 1.5rem;
-  border-radius: 0.75rem;
-  background: #FEE2E2;
-  border: 1px solid #FECACA;
-  box-shadow: $shadow-sm;
-
-  &.error {
-    background: #FEE2E2;
-    border-color: #FECACA;
-
-    .alert-icon {
-      color: $danger;
-    }
-  }
-
-  .alert-content {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex: 1;
-  }
-
-  .alert-icon {
-    font-size: 1.25rem;
-  }
-
-  .alert-text {
-    color: #991B1B;
-    font-size: 0.9375rem;
-    font-weight: 500;
-  }
-
-  .close-alert {
-    background: none;
-    border: none;
-    color: #991B1B;
-    cursor: pointer;
-    font-size: 1.25rem;
-    padding: 0.25rem;
-    opacity: 0.6;
-    transition: opacity 0.2s;
-
-    &:hover {
-      opacity: 1;
-    }
-  }
-}
-
-.books-list-section {
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-
-    .section-title-main {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: $text-dark;
-      margin: 0;
-    }
-
-    .books-count {
-      display: flex;
-      align-items: baseline;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
-      border-radius: 2rem;
-      color: $white;
-
-      .count-number {
-        font-size: 1.5rem;
-        font-weight: 700;
-      }
-
-      .count-text {
-        font-size: 0.875rem;
-      }
-    }
-  }
-
-  .filters-bar {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    padding: 1.25rem;
-    background: $white;
-    border-radius: 0.75rem;
-    box-shadow: $shadow;
-    flex-wrap: wrap;
-
-    .filter-item {
+  .books-main {
+    .toast-container {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      z-index: 9999;
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
-      flex: 1;
-      min-width: 200px;
+      gap: 8px;
+      max-width: 350px;
 
-      label {
-        font-size: 0.8125rem;
-        font-weight: 600;
-        color: $text-gray;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+      @media (max-width: 640px) {
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+        max-width: none;
       }
 
-      select,
-      input {
-        padding: 0.625rem 1rem;
-        border: 2px solid $border;
-        border-radius: 0.5rem;
-        font-size: 0.9375rem;
-        color: $text-dark;
-        background: $white;
-        cursor: pointer;
-        transition: all 0.2s;
-
-        &:focus {
-          outline: none;
-          border-color: $primary;
-          box-shadow: 0 0 0 3px rgba($primary, 0.1);
-        }
-      }
-
-      input {
-        cursor: text;
-      }
-    }
-  }
-
-  .books-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.5rem;
-
-    @media (max-width: 640px) {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    background: $white;
-    border-radius: 1rem;
-    box-shadow: $shadow;
-
-    .empty-icon {
-      font-size: 4rem;
-      margin-bottom: 1rem;
-    }
-
-    h3 {
-      font-size: 1.5rem;
-      color: $text-dark;
-      margin: 0 0 0.5rem 0;
-    }
-
-    p {
-      color: $text-gray;
-      margin: 0;
-    }
-  }
-}
-
-.book-card {
-  background: $white;
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: $shadow;
-  transition: all 0.3s;
-  display: flex;
-  flex-direction: column;
-
-  &:hover {
-    transform: translateY(-8px);
-    box-shadow: $shadow-xl;
-  }
-
-  .book-image-container {
-    position: relative;
-    background: $bg-light;
-
-    .image-wrapper {
-      position: relative;
-      width: 100%;
-      height: 200px;
-      overflow: hidden;
-
-      .book-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s;
-      }
-
-      &:hover .book-image {
-        transform: scale(1.05);
-      }
-
-      .stock-badge {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        padding: 0.375rem 0.875rem;
-        background: $success;
-        color: $white;
-        border-radius: 2rem;
-        font-size: 0.8125rem;
-        font-weight: 600;
-        box-shadow: $shadow-md;
-
-        &.out-of-stock {
-          background: $danger;
-        }
-      }
-
-      .offer-badge {
-        position: absolute;
-        top: 1rem;
-        left: 1rem;
-        padding: 0.375rem 0.875rem;
-        background: $warning;
-        color: $white;
-        border-radius: 2rem;
-        font-size: 0.8125rem;
-        font-weight: 700;
-        box-shadow: $shadow-md;
-      }
-    }
-
-    .image-thumbnails-small {
-      display: flex;
-      gap: 0.5rem;
-      padding: 0.75rem;
-      background: rgba(0,0,0,0.02);
-
-      .thumbnail-small {
-        width: 50px;
-        height: 50px;
-        border-radius: 0.5rem;
-        overflow: hidden;
-        cursor: pointer;
-        border: 2px solid transparent;
-        transition: all 0.2s;
-
-        &:hover {
-          border-color: $primary;
-          transform: scale(1.05);
-        }
-
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-      }
-
-      .more-images {
-        width: 50px;
-        height: 50px;
-        border-radius: 0.5rem;
-        background: $primary;
-        color: $white;
+      .toast {
         display: flex;
         align-items: center;
-        justify-content: center;
-        font-size: 0.8125rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.2s;
+        justify-content: space-between;
+        padding: 10px 14px;
+        border-radius: 8px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        backdrop-filter: blur(8px);
+        min-width: 280px;
+        font-size: 14px;
 
-        &:hover {
-          background: $primary-dark;
-          transform: scale(1.05);
+        @media (max-width: 640px) {
+          min-width: auto;
+        }
+
+        &.toast-success {
+          background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+          color: white;
+        }
+        &.toast-error {
+          background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+          color: white;
+        }
+        &.toast-info {
+          background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+          color: white;
+        }
+
+        .toast-content {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex: 1;
+        }
+
+        .toast-icon {
+          font-size: 16px;
+          width: 20px;
+          height: 20px;
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .toast-message {
+          font-weight: 500;
+          line-height: 1.3;
+        }
+
+        .toast-close {
+          background: rgba(255, 255, 255, 0.2);
+          border: none;
+          color: white;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          cursor: pointer;
+          font-size: 14px;
+          margin-right: 4px;
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+          }
         }
       }
     }
-  }
 
-  .book-content {
-    padding: 1.25rem;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    .books-list-section {
+      padding: 2rem 0;
+      background: $white;
 
-    .book-name {
-      font-size: 1.125rem;
-      font-weight: 700;
-      color: $text-dark;
-      margin: 0;
-      line-height: 1.4;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 0.5rem;
+      }
 
-    .book-title {
-      font-size: 0.875rem;
-      color: $text-gray;
-      margin: 0;
-      line-height: 1.5;
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .book-category {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-      padding: 0.25rem 0.75rem;
-      background: rgba($primary, 0.1);
-      color: $primary;
-      border-radius: 2rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
-    .book-details {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-
-      .detail-item {
+      .section-header {
         display: flex;
         justify-content: space-between;
-        font-size: 0.8125rem;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding: 0 1rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
 
-        .detail-label {
-          color: $text-gray;
-        }
-
-        .detail-value {
-          color: $text-dark;
-          font-weight: 600;
-        }
-      }
-    }
-
-    .book-price {
-      margin-top: auto;
-      padding-top: 0.75rem;
-      border-top: 2px solid $bg-light;
-
-      .price-main {
-        display: flex;
-        align-items: baseline;
-        gap: 0.375rem;
-
-        .current-price {
-          font-size: 1.75rem;
+        .section-title-main {
+          font-size: 2rem;
           font-weight: 700;
-          color: $primary;
+          color: $text-dark;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
         }
 
-        .currency {
-          font-size: 0.875rem;
-          color: $text-gray;
+        .books-count {
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: $text-dark;
+
+          .count-number {
+            color: $bright-orange;
+          }
+
+          .count-text {
+            opacity: 0.8;
+          }
         }
-      }
 
-      .price-original {
-        margin-top: 0.25rem;
-
-        .original-amount {
-          font-size: 0.875rem;
-          color: $text-gray;
-          text-decoration: line-through;
-        }
-      }
-    }
-
-    .book-actions {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.75rem;
-
-      .action-btn {
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        font-size: 0.875rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-
-        &.cart {
-          flex: 1;
-          background: $primary;
+        .sidebar-toggle {
+          display: none;
+          background: $primary-brand;
           color: $white;
           border: none;
+          padding: 0.5rem 1rem;
+          border-radius: 8px;
+          font-size: 1rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
 
           &:hover {
-            background: $primary-dark;
+            background: $bright-orange;
+            transform: scale(1.05);
+          }
+
+          .toggle-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+          }
+
+          @media (max-width: 991.98px) {
+            display: flex;
+          }
+        }
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        right: 100%;
+        width: 280px;
+        height: 100%;
+        background: $white;
+        box-shadow: 0 4px 16px $shadow-dark;
+        z-index: 1000;
+        transition: right 0.3s ease;
+
+        &.open {
+          right: 0;
+        }
+
+        .sidebar-content {
+          padding: 2rem 1rem;
+          height: 100%;
+          overflow-y: auto;
+
+          .sidebar-close {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: $primary-brand;
+            color: $white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            &:hover {
+              background: $bright-orange;
+              transform: scale(1.1);
+            }
+          }
+
+          .filters-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
           }
         }
 
-        &.fav {
+        @media (min-width: 992px) {
+          display: none;
+        }
+      }
+
+      .filters-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 0 1rem;
+
+        &.desktop-filters {
+          @media (max-width: 991.98px) {
+            display: none;
+          }
+        }
+
+        .filter-item {
+          flex: 1;
+          min-width: 200px;
+
+          label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: $text-dark;
+            margin-bottom: 0.3rem;
+            display: block;
+          }
+
+          input,
+          select {
+            width: 100%;
+            padding: 0.7rem;
+            border: 2px solid $accent-yellow;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: 'Tajawal', sans-serif;
+            background: rgba($white, 0.8);
+            transition: all 0.3s ease;
+
+            &:focus {
+              outline: none;
+              border-color: $bright-orange;
+              background: $white;
+              box-shadow: 0 0 5px $shadow-light;
+            }
+          }
+
+          input {
+            &::placeholder {
+              color: $text-dark;
+              opacity: 0.5;
+            }
+          }
+        }
+      }
+
+      .books-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        padding: 0 1rem;
+
+        .book-card {
           background: $white;
-          border: 2px solid $border;
-          color: $danger;
+          border-radius: 12px;
+          box-shadow: 0 4px 12px $shadow-medium;
+          overflow: hidden;
+          transition: all 0.3s ease;
+          display: flex;
+          flex-direction: column;
+          min-height: 450px; /* Ensure consistent card height */
 
           &:hover {
-            border-color: $danger;
+            transform: translateY(-5px);
+            box-shadow: 0 6px 18px $shadow-dark;
+
+            .book-image {
+              transform: scale(1.03);
+            }
+
+            .book-name {
+              color: $primary-brand;
+            }
           }
+
+          .book-image-container {
+            position: relative;
+            flex-shrink: 0;
+
+            .image-wrapper {
+              position: relative;
+              width: 100%;
+              height: 200px;
+
+              .book-image {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s ease;
+              }
+
+              .stock-badge {
+                position: absolute;
+                top: 8px;
+                left: 8px;
+                background: $grass-green;
+                color: $white;
+                padding: 0.3rem 0.7rem;
+                border-radius: 8px;
+                font-size: 0.75rem;
+                font-weight: 600;
+
+                &.out-of-stock {
+                  background: #EF4444;
+                }
+              }
+
+              .offer-badge {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                background: $happy-pink;
+                color: $white;
+                padding: 0.3rem 0.7rem;
+                border-radius: 8px;
+                font-size: 0.75rem;
+                font-weight: 600;
+              }
+            }
+
+            .image-thumbnails-small {
+              display: flex;
+              gap: 0.5rem;
+              padding: 0.5rem;
+              justify-content: center;
+              background: rgba($white, 0.9);
+
+              .thumbnail-small {
+                width: 50px;
+                height: 50px;
+                cursor: pointer;
+                border: 2px solid transparent;
+                border-radius: 5px;
+                overflow: hidden;
+                transition: all 0.3s ease;
+
+                img {
+                  width: 100%;
+                  height: 100%;
+                  object-fit: cover;
+                }
+
+                &:hover {
+                  border-color: $accent-yellow;
+                  transform: scale(1.05);
+                }
+              }
+
+              .more-images {
+                width: 50px;
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba($text-dark, 0.1);
+                border-radius: 5px;
+                font-size: 0.9rem;
+                font-weight: 600;
+                color: $text-dark;
+                cursor: pointer;
+
+                &:hover {
+                  background: rgba($text-dark, 0.2);
+                }
+              }
+            }
+          }
+
+          .book-content {
+            padding: 1rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+
+            .book-info {
+              flex-grow: 1; /* Allow info to take available space */
+            }
+
+            .book-name {
+              font-size: 1.3rem;
+              font-weight: 600;
+              color: $text-dark;
+              margin-bottom: 0.3rem;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+
+            .book-title {
+              font-size: 0.9rem;
+              color: $text-dark;
+              opacity: 0.7;
+              margin-bottom: 0.5rem;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+
+            .book-category {
+              background: $grass-green;
+              color: $white;
+              padding: 0.3rem 0.7rem;
+              border-radius: 12px;
+              font-size: 0.75rem;
+              font-weight: 600;
+              margin-bottom: 0.5rem;
+              width: fit-content;
+            }
+
+            .book-details {
+              display: flex;
+              flex-direction: column;
+              gap: 0.3rem;
+              margin-bottom: 0.5rem;
+
+              .detail-item {
+                display: flex;
+                justify-content: space-between;
+                font-size: 0.85rem;
+
+                .detail-label {
+                  color: $text-dark;
+                  opacity: 0.7;
+                }
+
+                .detail-value {
+                  color: $text-dark;
+                  font-weight: 600;
+                }
+              }
+            }
+
+            .book-price {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin-bottom: 0.5rem;
+
+              .price-main {
+                display: flex;
+                align-items: baseline;
+                gap: 0.3rem;
+
+                .current-price {
+                  font-size: 1.2rem;
+                  font-weight: 600;
+                  color: $bright-orange;
+                }
+
+                .currency {
+                  font-size: 0.9rem;
+                  color: $text-dark;
+                  opacity: 0.7;
+                }
+              }
+
+              .price-original {
+                .original-amount {
+                  font-size: 0.9rem;
+                  color: $text-dark;
+                  opacity: 0.5;
+                  text-decoration: line-through;
+                }
+              }
+            }
+
+            .book-actions {
+              display: flex;
+              gap: 0.7rem;
+              justify-content: center;
+              margin-top: auto; /* Push buttons to the bottom */
+              padding-top: 0.5rem;
+
+              .action-btn {
+                display: flex;
+                align-items: center;
+                gap: 0.3rem;
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+                font-weight: 600;
+                border: 2px solid $accent-yellow;
+                border-radius: 20px;
+                background: $white;
+                color: $primary-brand;
+                cursor: pointer;
+                transition: all 0.3s ease;
+
+                &.cart-btn {
+                  &:hover:not(:disabled) {
+                    background: $accent-yellow;
+                    color: $white;
+                  }
+
+                  &:disabled {
+                    background: #D1D5DB;
+                    opacity: 0.7;
+                    cursor: not-allowed;
+                  }
+                }
+
+                &.remove-btn {
+                  border-color: $happy-pink;
+                  color: $happy-pink;
+
+                  &:hover:not(:disabled) {
+                    background: $happy-pink;
+                    color: $white;
+                  }
+                }
+
+                &.fav-btn {
+                  &.active {
+                    background: $happy-pink;
+                    color: $white;
+                    animation: heartBeat 0.4s ease;
+                  }
+
+                  &:hover:not(.active) {
+                    background: rgba($happy-pink, 0.1);
+                    color: $happy-pink;
+                  }
+
+                  .heart-icon {
+                    font-size: 1rem;
+                  }
+                }
+
+                .btn-icon {
+                  font-size: 1rem;
+                }
+
+                .btn-text {
+                  font-size: 0.85rem;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 4rem 1.5rem;
+        background: $white;
+        border-radius: 16px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+
+        .empty-icon {
+          font-size: 4rem;
+          margin-bottom: 1rem;
+          opacity: 0.6;
+        }
+
+        h3 {
+          font-size: 1.5rem;
+          color: $text-dark;
+          margin: 0 0 0.5rem 0;
+          font-weight: 600;
+        }
+
+        p {
+          color: $text-dark;
+          margin: 0;
+          font-size: 0.9375rem;
+          opacity: 0.7;
         }
       }
     }
 
-    .book-description {
-      font-size: 0.75rem;
-      color: $text-gray;
-      line-height: 1.6;
-    }
-  }
-}
-
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-  backdrop-filter: blur(4px);
-  animation: fadeIn 0.2s;
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  .modal-content {
-    background: $white;
-    border-radius: 1rem;
-    box-shadow: $shadow-xl;
-    max-width: 900px;
-    width: 100%;
-    position: relative;
-    animation: slideUp 0.3s;
-    max-height: 90vh;
-    overflow-y: auto;
-
-    @keyframes slideUp {
-      from {
-        transform: translateY(20px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    .close-modal {
-      position: absolute;
-      top: 1rem;
-      left: 1rem;
-      width: 40px;
-      height: 40px;
-      background: $danger;
-      color: $white;
-      border: none;
-      border-radius: 50%;
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba($text-dark, 0.8);
+      z-index: 9999;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      font-size: 1.25rem;
-      font-weight: 700;
-      transition: all 0.2s;
-      box-shadow: $shadow-md;
 
-      &:hover {
-        background: $danger-hover;
-        transform: rotate(90deg) scale(1.1);
-      }
-    }
+      .modal-content {
+        position: relative;
+        max-width: 90%;
+        max-height: 90%;
+        background: $white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 16px $shadow-dark;
 
-    .carousel {
-      position: relative;
-      padding: 2rem;
-
-      .modal-image {
-        max-width: 100%;
-        max-height: 70vh;
-        object-fit: contain;
-        border-radius: 0.75rem;
-      }
-
-      .carousel-btn {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 48px;
-        height: 48px;
-        background: rgba(0, 0, 0, 0.7);
-        color: $white;
-        border: none;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-size: 1.5rem;
-        transition: all 0.2s;
-        box-shadow: $shadow-lg;
-
-        &:hover {
-          background: rgba(0, 0, 0, 0.9);
-          transform: translateY(-50%) scale(1.1);
-        }
-
-        &.prev {
-          right: 1rem;
-        }
-
-        &.next {
-          left: 1rem;
-        }
-      }
-
-      .carousel-indicators {
-        display: flex;
-        justify-content: center;
-        gap: 0.5rem;
-        margin-top: 1rem;
-
-        span {
-          width: 10px;
-          height: 10px;
-          background: $border;
+        .close-modal {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          background: $primary-brand;
+          color: $white;
+          border: none;
+          width: 30px;
+          height: 30px;
           border-radius: 50%;
+          font-size: 1rem;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.3s ease;
 
           &:hover {
-            background: $text-gray;
-          }
-
-          &.active {
-            background: $primary;
-            width: 24px;
-            border-radius: 5px;
+            background: $bright-orange;
+            transform: scale(1.1);
           }
         }
-      }
 
-      .image-counter {
-        text-align: center;
-        margin-top: 1rem;
-        color: $text-gray;
-        font-size: 0.875rem;
-        font-weight: 600;
-      }
-    }
-  }
-}
+        .carousel {
+          position: relative;
+          max-width: 600px;
 
-@media (max-width: 1400px) {
-  .books-grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  }
-}
+          .modal-image {
+            width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+          }
 
-@media (max-width: 1024px) {
-  .books-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  }
+          .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: $primary-brand;
+            color: $white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
 
-  .book-card .book-image-container .image-wrapper {
-    height: 180px;
-  }
-}
+            &.prev {
+              left: 10px;
+            }
 
-@media (max-width: 768px) {
-  .books-header .header-content {
-    flex-direction: column;
-    align-items: stretch;
-  }
+            &.next {
+              right: 10px;
+            }
 
-  .filters-bar {
-    flex-direction: column;
+            &:hover {
+              background: $bright-orange;
+              transform: translateY(-50%) scale(1.1);
+            }
+          }
 
-    .filter-item {
-      min-width: 100%;
-    }
-  }
+          .carousel-indicators {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
 
-  .books-grid {
-    grid-template-columns: 1fr;
-  }
+            span {
+              width: 8px;
+              height: 8px;
+              background: rgba($text-dark, 0.5);
+              border-radius: 50%;
+              cursor: pointer;
+              transition: all 0.3s ease;
 
-  .book-card {
-    .book-image-container .image-wrapper {
-      height: 220px;
-    }
-  }
+              &.active {
+                background: $accent-yellow;
+                transform: scale(1.2);
+              }
+            }
+          }
 
-  .modal .modal-content {
-    margin: 1rem;
-    max-height: 85vh;
-
-    .carousel {
-      padding: 1rem;
-
-      .carousel-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 1.25rem;
-
-        &.prev {
-          right: 0.5rem;
+          .image-counter {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba($text-dark, 0.7);
+            color: $white;
+            padding: 0.3rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+          }
         }
-
-        &.next {
-          left: 0.5rem;
-        }
       }
     }
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 991.98px) {
   .books-main {
-    padding: 0.75rem;
-  }
+    .books-list-section {
+      .section-header {
+        .section-title-main {
+          font-size: 1.8rem;
+        }
 
-  .books-header {
-    .header-title {
-      font-size: 1.25rem;
-    }
-
-    .header-subtitle {
-      font-size: 0.8125rem;
-    }
-  }
-
-  .book-card {
-    .book-image-container .image-wrapper {
-      height: 180px;
-    }
-
-    .book-content {
-      padding: 1rem;
-
-      .book-name {
-        font-size: 1rem;
+        .books-count {
+          font-size: 1rem;
+        }
       }
 
-      .book-price .price-main .current-price {
-        font-size: 1.5rem;
+      .books-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+
+        .book-card {
+          min-height: 420px; /* Adjusted for smaller screens */
+
+          .book-image-container {
+            .image-wrapper {
+              height: 180px;
+            }
+
+            .image-thumbnails-small {
+              .thumbnail-small {
+                width: 45px;
+                height: 45px;
+              }
+
+              .more-images {
+                width: 45px;
+                height: 45px;
+                font-size: 0.85rem;
+              }
+            }
+          }
+
+          .book-content {
+            .book-name {
+              font-size: 1.2rem;
+            }
+
+            .book-title {
+              font-size: 0.85rem;
+            }
+
+            .book-category {
+              font-size: 0.7rem;
+            }
+
+            .book-details {
+              .detail-item {
+                font-size: 0.8rem;
+              }
+            }
+
+            .book-price {
+              .price-main {
+                .current-price {
+                  font-size: 1.1rem;
+                }
+
+                .currency {
+                  font-size: 0.85rem;
+                }
+              }
+
+              .price-original {
+                .original-amount {
+                  font-size: 0.85rem;
+                }
+              }
+            }
+
+            .book-actions {
+              .action-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.85rem;
+
+                .btn-icon {
+                  font-size: 0.9rem;
+                }
+
+                .btn-text {
+                  font-size: 0.8rem;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .empty-state {
+        padding: 3rem 1rem;
+
+        .empty-icon {
+          font-size: 3rem;
+        }
+
+        h3 {
+          font-size: 1.3rem;
+        }
+
+        p {
+          font-size: 0.875rem;
+        }
+      }
+
+      .modal {
+        .modal-content {
+          max-width: 95%;
+        }
       }
     }
   }
 }
-// Add to children-books.component.scss
-.book-actions {
-  display: flex;
-  gap: 10px;
-  margin: 15px 0;
 
-  .action-btn {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
+@media (max-width: 575.98px) {
+  .books-main {
+    .books-list-section {
+      .section-header {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
 
-    &.cart {
-      background: #00b894;
-      color: white;
-      flex: 1;
+        .section-title-main {
+          font-size: 1.5rem;
+        }
 
-      &:disabled {
-        background: #ddd;
-        cursor: not-allowed;
+        .books-count {
+          font-size: 0.9rem;
+        }
       }
-    }
 
-    &.fav {
-      width: 50px;
-      background: #f1f2f6;
-      color: #636e72;
+      .books-grid {
+        grid-template-columns: 1fr;
 
-      &.active {
-        background: #ff4757;
-        color: white;
-        animation: heartBeat 0.3s ease;
+        .book-card {
+          min-height: 400px; /* Adjusted for mobile */
+
+          .book-image-container {
+            .image-wrapper {
+              height: 160px;
+            }
+
+            .image-thumbnails-small {
+              .thumbnail-small {
+                width: 40px;
+                height: 40px;
+              }
+
+              .more-images {
+                width: 40px;
+                height: 40px;
+                font-size: 0.8rem;
+              }
+            }
+          }
+        }
       }
-    }
-
-    &:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
   }
-}
-
-// Heart beat animation
-@keyframes heartBeat {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
 }

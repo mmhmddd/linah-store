@@ -18,7 +18,7 @@ export const routes: Routes = [
   { path: '', component: HomeComponent, title: 'LinaStore | Home' },
   { path: 'about', component: AboutComponent, title: 'LinaStore | About Us' },
   { path: 'contact', component: ContactComponent, title: 'LinaStore | Contact' },
-  { path: 'children-books', component: ChildrenBooksComponent, title: 'LinaStore | Children Books' },
+  { path: 'all-books', component: ChildrenBooksComponent, title: 'LinaStore | All Books' },
   { path: 'book/:id', component: BookDetailsComponent, title: 'LinaStore | Book Details' },
   { path: 'cart', component: CartComponent, title: 'LinaStore | Cart' },
   { path: 'favourite', component: FavouriteComponent, title: 'LinaStore | Favourite' },
@@ -26,7 +26,7 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent, title: 'LinaStore | Register' },
   { path: 'dashboard', component: DashboardComponent, title: 'LinaStore | Dashboard' },
   { path: 'books-control', component: BooksControlComponent, title: 'LinaStore | Books Control' },
-  { path: 'users-control', component: UsersControlComponent, title: 'LinaStore | Users Control' }, 
+  { path: 'users-control', component: UsersControlComponent, title: 'LinaStore | Users Control' },
   { path: 'orders-control', component: OrdersControlComponent, title: 'LinaStore | Orders Control' },
   { path: '**', redirectTo: '', pathMatch: 'full' },
 ];

@@ -1,4 +1,3 @@
-// cart.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -35,6 +34,7 @@ export class CartComponent implements OnInit, OnDestroy {
     'مطروح', 'قنا', 'شمال سيناء', 'جنوب سيناء', 'سوهاج'
   ];
   fallbackImage: string = '/assets/images/fallback.jpg';
+  message: { text: string, type: 'success' | 'error' | 'confirm', callback?: () => void } | null = null;
 
   private cartSubscription?: Subscription;
   private authReadySubscription?: Subscription;
@@ -106,30 +106,37 @@ export class CartComponent implements OnInit, OnDestroy {
 
   updateQuantity(item: CartItem, change: number) {
     const newQuantity = Math.max(1, item.quantity + change);
-    this.cartService.updateQuantity(item.book._id, newQuantity).subscribe({
-      error: (err) => alert('فشل في تحديث الكمية: ' + err.message)
-    });
+    if (newQuantity !== item.quantity) {
+      this.cartService.updateQuantity(item.book._id, newQuantity).subscribe({
+      });
+    }
   }
 
   removeFromCart(bookId: string) {
-    this.cartService.removeFromCart(bookId).subscribe({
-      next: () => {
-        if (this.cartItems.length === 0) {
-          this.step = 1;
-          this.discount = 0;
-          this.shippingInfo.saleCode = '';
+    this.showMessage('هل أنت متأكد من إزالة هذا العنصر من السلة؟', 'confirm', () => {
+      this.cartService.removeFromCart(bookId).subscribe({
+        next: () => {
+          this.showMessage('تمت إزالة العنصر بنجاح', 'success');
+          if (this.cartItems.length === 0) {
+            this.step = 1;
+            this.discount = 0;
+            this.shippingInfo.saleCode = '';
+          }
+        },
+        error: (err) => {
+          this.showMessage('فشل في إزالة العنصر: ' + err.message, 'error');
         }
-      },
-      error: (err) => alert('فشل في إزالة العنصر: ' + err.message)
+      });
     });
   }
 
   applyCoupon() {
     if (this.shippingInfo.saleCode === 'DISCOUNT10') {
       this.discount = this.getSubtotal() * 0.1;
+      this.showMessage('تم تطبيق الكوبون بنجاح', 'success');
     } else {
       this.discount = 0;
-      alert('كوبون غير صالح');
+      this.showMessage('كوبون غير صالح', 'error');
     }
   }
 
@@ -160,16 +167,36 @@ export class CartComponent implements OnInit, OnDestroy {
         notes: this.shippingInfo.notes || undefined
       }).subscribe({
         next: (order: Order) => {
-          alert('تم تأكيد الطلب بنجاح!');
+          this.showMessage('تم تأكيد الطلب بنجاح!', 'success');
           this.cartService.clearCart().subscribe(() => {
             this.resetForm();
           });
         },
-        error: (err) => alert('فشل في إنشاء الطلب: ' + err.message)
+        error: (err) => this.showMessage('فشل في إنشاء الطلب: ' + err.message, 'error')
       });
     } else {
-      alert('يرجى ملء جميع الحقول المطلوبة');
+      this.showMessage('يرجى ملء جميع الحقول المطلوبة', 'error');
     }
+  }
+
+  private showMessage(text: string, type: 'success' | 'error' | 'confirm', callback?: () => void) {
+    this.message = { text, type, callback };
+    setTimeout(() => {
+      if (this.message?.type !== 'confirm') {
+        this.message = null;
+      }
+    }, 3000);
+  }
+
+  confirmAction() {
+    if (this.message?.callback) {
+      this.message.callback();
+    }
+    this.message = null;
+  }
+
+  cancelAction() {
+    this.message = null;
   }
 
   private resetForm(): void {

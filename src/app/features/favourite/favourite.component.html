@@ -95,11 +95,6 @@
               (click)="removeFromFavorites(book)">
               <span>🗑️ إزالة من المفضلة</span>
             </button>
-
-            <!-- ✅ DESCRIPTION -->
-            <div class="book-description" *ngIf="book.description">
-              {{ book.description | slice:0:80 }}{{ book.description.length > 80 ? '...' : '' }}
-            </div>
           </div>
         </div>
       </div>

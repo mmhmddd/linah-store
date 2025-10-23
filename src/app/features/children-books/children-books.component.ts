@@ -1,17 +1,29 @@
-// children-books.component.ts
 import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BooksService, Book } from '../../core/services/books.service';
-import { CartService } from '../../core/services/cart.service';
+import { CartService, CartItem } from '../../core/services/cart.service';
+import { FavoritesService } from '../../core/services/favourite.service';
 import { environment } from '../../../environments/environment';
 import { retry, catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
-import { Subscription } from 'rxjs';
-import { FavoritesService } from '../../core/services/favourite.service';  // ✅ NEW: Import FavoritesService
+import { throwError, Subscription } from 'rxjs';
+
+// Cart Response Interface
+interface CartResponse {
+  success?: boolean;
+  alreadyInCart?: boolean;
+  message?: string;
+  item?: any;
+}
+
+interface Toast {
+  id: number;
+  message: string;
+  type: 'success' | 'error' | 'info';
+}
 
 @Component({
-  selector: 'app-children-books',
+  selector: 'app-children-books-and-stories',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './children-books.component.html',
@@ -21,7 +33,6 @@ export class ChildrenBooksComponent implements OnInit, OnDestroy {
   books: Book[] = [];
   filteredBooks: Book[] = [];
   categories: string[] = [];
-  errorMessage: string | null = null;
   imageModalUrls: string[] | null = null;
   currentImageIndex: number = 0;
   stockFilter: string = '';
@@ -30,48 +41,92 @@ export class ChildrenBooksComponent implements OnInit, OnDestroy {
   searchTerm: string = '';
   fallbackImage: string = '/assets/images/fallback.jpg';
   activeSlides: { [key: string]: number } = {};
+  toasts: Toast[] = [];
+  isSidebarOpen: boolean = false;
+  private toastIdCounter = 0;
   private loadingImages = new Map<string, boolean>();
-
-  // ✅ NEW: Track favorites state
   private subscriptions = new Subscription();
+  private cartItems: string[] = []; // Track cart item IDs
 
   constructor(
     private booksService: BooksService,
     private cartService: CartService,
-    private favoritesService: FavoritesService,  // ✅ NEW: Inject FavoritesService
+    private favoritesService: FavoritesService,
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
+    this.isSidebarOpen = false;
+    console.log('Initial sidebar state:', this.isSidebarOpen);
     this.loadBooks();
     this.loadCategories();
-    this.initializeFavorites();  // ✅ NEW: Initialize favorites
+    this.initializeFavorites();
+    this.loadCartItems();
   }
 
-  // ✅ NEW: Initialize favorites tracking
-  private initializeFavorites(): void {
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
+  private loadCartItems(): void {
     this.subscriptions.add(
-      this.favoritesService.favoriteItems$.subscribe(() => {
-        this.cdr.detectChanges();  // Trigger change detection when favorites change
+      this.cartService.cartItems$.subscribe({
+        next: (items: CartItem[]) => {
+          this.cartItems = items.map((item: CartItem) => item.book._id);
+          this.cdr.detectChanges();
+        },
+        error: (err: any) => {
+          console.error('Error loading cart items:', err);
+          this.showToast('فشل في تحميل عناصر السلة', 'error');
+        }
       })
     );
   }
 
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();  // ✅ NEW: Cleanup
+  private initializeFavorites(): void {
+    this.subscriptions.add(
+      this.favoritesService.favoriteItems$.subscribe(() => {
+        this.cdr.detectChanges();
+      })
+    );
   }
 
-  loadBooks() {
+  showToast(message: string, type: 'success' | 'error' | 'info' = 'success'): void {
+    const toast: Toast = {
+      id: this.toastIdCounter++,
+      message,
+      type
+    };
+
+    this.toasts.push(toast);
+    this.cdr.detectChanges();
+
+    setTimeout(() => {
+      this.removeToast(toast.id);
+    }, 3000);
+  }
+
+  removeToast(id: number): void {
+    this.toasts = this.toasts.filter(t => t.id !== id);
+    this.cdr.detectChanges();
+  }
+
+  toggleSidebar(): void {
+    this.isSidebarOpen = !this.isSidebarOpen;
+    this.cdr.detectChanges();
+  }
+
+  loadBooks(): void {
     this.booksService.getAllBooks().pipe(
       retry(2),
       catchError(err => {
-        this.errorMessage = 'فشل في تحميل الكتب. يرجى المحاولة مرة أخرى: ' + (err.error?.message || err.message || 'غير معروف');
-        this.cdr.detectChanges();
+        this.showToast('فشل في تحميل الكتب والقصص. يرجى المحاولة مرة أخرى', 'error');
+        console.error('Error loading books and stories:', err);
         return throwError(() => err);
       })
     ).subscribe({
       next: (books) => {
-        console.log('Books received from API:', books);
+        console.log('Books and stories received from API:', books);
         books.forEach(book => {
           book.imgs = Array.isArray(book.imgs) ? book.imgs : [];
           book.stockStatus = book.quantity > 0 ? 'inStock' : 'outOfStock';
@@ -82,48 +137,157 @@ export class ChildrenBooksComponent implements OnInit, OnDestroy {
         this.books = books;
         this.filteredBooks = [...this.books];
         this.sortBooks();
-        this.errorMessage = null;
         this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
+        console.error('Failed to load books and stories:', err);
         this.cdr.detectChanges();
       }
     });
   }
 
-  loadCategories() {
-    this.booksService.getAllBooks().subscribe(books => {
-      this.categories = [...new Set(books.map(book => book.category))];
-      console.log('Available categories:', this.categories);
+  loadCategories(): void {
+    this.booksService.getAllBooks().subscribe({
+      next: (books) => {
+        this.categories = [...new Set(books.map(book => book.category))];
+        if (!this.categories.includes('قصص')) {
+          this.categories.push('قصص');
+        }
+        console.log('Available categories:', this.categories);
+      },
+      error: (err) => {
+        console.error('Error loading categories:', err);
+      }
     });
   }
 
-  // ✅ FIXED: Check if book is favorited
   isBookFavorited(book: Book): boolean {
     return this.favoritesService.isFavorited(book._id);
   }
 
-  // ✅ FIXED: Toggle favorite (add/remove)
   toggleFavorite(book: Book): void {
     if (!book._id) {
-      alert('خطأ: لا يمكن إضافة الكتاب بدون معرف');
+      this.showToast('خطأ: لا يمكن إضافة الكتاب أو القصة بدون معرف', 'error');
       return;
     }
 
     this.favoritesService.toggleFavorite(book._id).subscribe({
       next: (result) => {
         if (result.isAdded) {
-          console.log('Added to favorites:', book.name);
-          alert(`تمت إضافة "${book.name}" إلى المفضلة`);
+          this.showToast(`تمت إضافة "${book.name}" إلى المفضلة ♥`, 'success');
         } else if (result.isRemoved) {
-          console.log('Removed from favorites:', book.name);
-          alert(`تمت إزالة "${book.name}" من المفضلة`);
+          this.showToast(`تمت إزالة "${book.name}" من المفضلة`, 'info');
         }
-        this.cdr.detectChanges();  // Update UI
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error toggling favorite:', err);
-        alert(`خطأ في ${this.isBookFavorited(book) ? 'إزالة' : 'إضافة'} الكتاب من المفضلة: ${err.message}`);
+        this.showToast(`خطأ في ${this.isBookFavorited(book) ? 'إزالة' : 'إضافة'} الكتاب أو القصة`, 'error');
+      }
+    });
+  }
+
+  isInCart(book: Book): boolean {
+    return this.cartItems.includes(book._id);
+  }
+
+  addToCart(book: Book): void {
+    if (!book._id) {
+      this.showToast('خطأ: لا يمكن إضافة الكتاب أو القصة بدون معرف', 'error');
+      return;
+    }
+
+    if (book.stockStatus === 'outOfStock') {
+      this.showToast('هذا الكتاب أو القصة غير متوفر حالياً', 'error');
+      return;
+    }
+
+    this.cartService.addToCart(book._id, 1).subscribe({
+      next: (response: CartResponse | any) => {
+        console.log('Cart response FULL:', JSON.stringify(response, null, 2));
+
+        if (response) {
+          if (response.alreadyInCart === true) {
+            this.showToast(`"${book.name}" موجود بالفعل في السلة 🛒`, 'info');
+            return;
+          }
+
+          if (response.success === true) {
+            this.cartItems.push(book._id); // Update local cart items
+            this.showToast(`تمت إضافة "${book.name}" إلى السلة 🛒`, 'success');
+            this.cdr.detectChanges();
+            return;
+          }
+
+          if (response.message && (
+            response.message.includes('already') ||
+            response.message.includes('موجود') ||
+            response.message.includes('duplicate')
+          )) {
+            this.showToast(`"${book.name}" موجود بالفعل في السلة 🛒`, 'info');
+            return;
+          }
+        }
+
+        this.cartItems.push(book._id); // Update local cart items
+        this.showToast(`تمت إضافة "${book.name}" إلى السلة 🛒`, 'success');
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error('Cart ERROR FULL:', JSON.stringify(err, null, 2));
+
+        if (err) {
+          if (err.error && err.error.message) {
+            const msg = err.error.message.toLowerCase();
+            if (
+              msg.includes('already') ||
+              msg.includes('موجود') ||
+              msg.includes('duplicate') ||
+              msg.includes('exists')
+            ) {
+              this.showToast(`"${book.name}" موجود بالفعل في السلة 🛒`, 'info');
+              return;
+            }
+          }
+
+          if (err.status === 409) {
+            this.showToast(`"${book.name}" موجود بالفعل في السلة 🛒`, 'info');
+            return;
+          }
+
+          if (err.status >= 400 && err.status < 500 && err.error) {
+            const fullError = JSON.stringify(err.error).toLowerCase();
+            if (
+              fullError.includes('already') ||
+              fullError.includes('موجود') ||
+              fullError.includes('duplicate')
+            ) {
+              this.showToast(`"${book.name}" موجود بالفعل في السلة 🛒`, 'info');
+              return;
+            }
+          }
+        }
+
+        this.showToast('الكتاب أو القصة مضاف بالفعل راجع السلة الخاصة بك', 'error');
+      }
+    });
+  }
+
+  removeFromCart(book: Book): void {
+    if (!book._id) {
+      this.showToast('خطأ: لا يمكن إزالة الكتاب أو القصة بدون معرف', 'error');
+      return;
+    }
+
+    this.cartService.removeFromCart(book._id).subscribe({
+      next: () => {
+        this.cartItems = this.cartItems.filter(id => id !== book._id);
+        this.showToast(`تمت إزالة "${book.name}" من السلة 🛒`, 'info');
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error removing from cart:', err);
+        this.showToast('فشل في إزالة الكتاب أو القصة من السلة', 'error');
       }
     });
   }
@@ -133,21 +297,26 @@ export class ChildrenBooksComponent implements OnInit, OnDestroy {
       console.warn('No image provided, using fallback');
       return this.fallbackImage;
     }
+
     if (img.startsWith('http://') || img.startsWith('https://')) {
       return img;
     }
+
     const baseUrl = environment.apiUrl.replace('/api', '');
+
     if (img.startsWith('/uploads')) {
       return `${baseUrl}${img}`;
     }
+
     if (!img.startsWith('/')) {
       return `${baseUrl}/uploads/${img}`;
     }
+
     return `${baseUrl}${img}`;
   }
 
-  handleImageError(bookId: string) {
-    console.warn(`Image error for book ID: ${bookId}`);
+  handleImageError(bookId: string): void {
+    console.warn(`Image error for book/story ID: ${bookId}`);
     const book = this.books.find(b => b._id === bookId);
     if (book && book.imgs[0]) {
       const url = this.getImageUrl(book.imgs[0]);
@@ -164,26 +333,7 @@ export class ChildrenBooksComponent implements OnInit, OnDestroy {
     return book.offer > 0;
   }
 
-  addToCart(book: Book): void {
-    if (!book._id) {
-      alert('خطأ: لا يمكن إضافة الكتاب بدون معرف');
-      return;
-    }
-    this.cartService.addToCart(book._id, 1).subscribe({
-      next: () => {
-        console.log('Added to cart:', book.name);
-        alert(`تمت إضافة "${book.name}" إلى السلة`);
-      },
-      error: err => {
-        console.error('Error adding to cart:', err);
-        alert(`خطأ في إضافة الكتاب إلى السلة: ${err.message}`);
-      }
-    });
-  }
-
-  // ✅ REMOVED: Old addToFavorites method (replaced with toggleFavorite)
-
-  openImageModal(img: string) {
+  openImageModal(img: string): void {
     const book = this.books.find(b => b.imgs.includes(img));
     this.imageModalUrls = book ? book.imgs : [img];
     this.currentImageIndex = book ? book.imgs.indexOf(img) : 0;
@@ -191,38 +341,31 @@ export class ChildrenBooksComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  prevImage() {
+  closeImageModal(): void {
+    this.imageModalUrls = null;
+    this.currentImageIndex = 0;
+    this.cdr.detectChanges();
+  }
+
+  prevImage(): void {
     if (this.imageModalUrls && this.currentImageIndex > 0) {
       this.currentImageIndex--;
       this.cdr.detectChanges();
     }
   }
 
-  nextImage() {
+  nextImage(): void {
     if (this.imageModalUrls && this.currentImageIndex < this.imageModalUrls.length - 1) {
       this.currentImageIndex++;
       this.cdr.detectChanges();
     }
   }
 
-  nextSlide(bookId: string, imgsLength: number): void {
-    if (this.activeSlides[bookId] !== undefined) {
-      this.activeSlides[bookId] = (this.activeSlides[bookId] + 1) % imgsLength;
+  setImageIndex(index: number): void {
+    if (this.imageModalUrls && index >= 0 && index < this.imageModalUrls.length) {
+      this.currentImageIndex = index;
       this.cdr.detectChanges();
     }
-  }
-
-  prevSlide(bookId: string, imgsLength: number): void {
-    if (this.activeSlides[bookId] !== undefined) {
-      this.activeSlides[bookId] = this.activeSlides[bookId] === 0
-        ? imgsLength - 1
-        : this.activeSlides[bookId] - 1;
-      this.cdr.detectChanges();
-    }
-  }
-
-  isActiveSlide(bookId: string, index: number): boolean {
-    return this.activeSlides[bookId] === index;
   }
 
   getCategoryEmoji(category: string): string {
@@ -233,32 +376,57 @@ export class ChildrenBooksComponent implements OnInit, OnDestroy {
       'قصص': '📖',
       'تعليمي': '🎓',
       'فنون': '🎨',
-      'أطفال': '👶'
+      'أطفال': '👶',
+      'تاريخ': '📜',
+      'رياضيات': '🔢',
+      'لغة': '📝',
+      'تراثي': '👵'
     };
     return emojiMap[category] || '📚';
   }
 
-  filterBooks() {
+  filterBooks(): void {
     console.log('Applying filters - Category:', this.categoryFilter, 'Stock:', this.stockFilter, 'Search:', this.searchTerm);
+
     this.filteredBooks = this.books.filter(book => {
       const categoryMatch = this.categoryFilter ? book.category === this.categoryFilter : true;
       const stockMatch = this.stockFilter ? book.stockStatus === this.stockFilter : true;
-      const searchMatch = this.searchTerm ? book.name.toLowerCase().includes(this.searchTerm.toLowerCase()) : true;
-      console.log(`Book: ${book.name}, Category Match: ${categoryMatch}, Stock Match: ${stockMatch}, Search Match: ${searchMatch}`);
+      const searchMatch = this.searchTerm
+        ? book.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+          book.title?.toLowerCase().includes(this.searchTerm.toLowerCase())
+        : true;
+
       return categoryMatch && stockMatch && searchMatch;
     });
-    console.log('Filtered books:', this.filteredBooks);
+
+    console.log('Filtered books and stories count:', this.filteredBooks.length);
     this.sortBooks();
     this.cdr.detectChanges();
   }
 
-  sortBooks() {
-    console.log('Sorting books by:', this.sortBy);
+  sortBooks(): void {
+    console.log('Sorting books and stories by:', this.sortBy);
+
     this.filteredBooks.sort((a, b) => {
-      if (this.sortBy === 'price') return a.price - b.price;
-      if (this.sortBy === 'quantity') return a.quantity - b.quantity;
-      return a.name.localeCompare(b.name, 'ar');
+      switch (this.sortBy) {
+        case 'price':
+          return a.price - b.price;
+        case 'quantity':
+          return b.quantity - a.quantity;
+        case 'name':
+        default:
+          return a.name.localeCompare(b.name, 'ar');
+      }
     });
+
     this.cdr.detectChanges();
+  }
+
+  trackByBookId(index: number, book: Book): string {
+    return book._id || index.toString();
+  }
+
+  trackByToastId(index: number, toast: Toast): number {
+    return toast.id;
   }
 }

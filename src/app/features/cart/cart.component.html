@@ -1,5 +1,15 @@
-<!-- cart.component.html (unchanged) -->
 <div class="cart-container" dir="rtl">
+  <!-- Message Overlay -->
+  <div *ngIf="message" class="message-overlay">
+    <div class="message-box" [ngClass]="{'success': message.type === 'success', 'error': message.type === 'error', 'confirm': message.type === 'confirm'}">
+      <p>{{message.text}}</p>
+      <div *ngIf="message.type === 'confirm'" class="confirm-buttons">
+        <button class="action-button" (click)="confirmAction()">تأكيد</button>
+        <button class="action-button cancel-button" (click)="cancelAction()">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Step 1: Cart View -->
   <div *ngIf="step === 1" class="cart-step">
     <div class="row">

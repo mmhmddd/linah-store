@@ -14,10 +14,10 @@ $shadow-light: rgba(255, 255, 255, 0.1);
 $shadow-medium: rgba(255, 255, 255, 0.15);
 
 .navbar {
-  background: $primary-bg;
+  background: linear-gradient(135deg, $primary-bg 0%, darken($primary-bg, 5%) 100%);
   padding: 1.3rem 0;
-  box-shadow: 0 2px 8px $shadow-light;
-  border-bottom: 1px solid $accent-yellow;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-bottom: 2px solid $accent-yellow;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -53,14 +53,15 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
   height: 60px;
   object-fit: contain;
   border-radius: 50%;
-  border: 1px solid $accent-yellow;
-  box-shadow: 0 2px 4px $shadow-light;
+  border: 2px solid $accent-yellow;
+  box-shadow: 0 2px 8px $shadow-light;
   transition: all 0.3s ease;
 }
 
 .navbar-brand .logo-img:hover {
   border-color: $accent-pink;
-  box-shadow: 0 4px 8px $shadow-medium;
+  box-shadow: 0 4px 12px $shadow-medium;
+  transform: scale(1.05);
 }
 
 .navbar-brand .brand-text {
@@ -84,11 +85,11 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
 }
 
 .navbar-toggler {
-  border: 1px solid $accent-yellow;
+  border: 2px solid $accent-yellow;
   padding: 0.5rem;
-  border-radius: 6px;
+  border-radius: 8px;
   background: $white;
-  box-shadow: 0 1px 3px $shadow-light;
+  box-shadow: 0 2px 6px $shadow-light;
   position: absolute;
   left: 1rem;
   display: flex;
@@ -99,7 +100,11 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba($accent-yellow, 0.3);
+    box-shadow: 0 0 0 3px rgba($accent-yellow, 0.4);
+  }
+
+  &:hover {
+    transform: scale(1.05);
   }
 }
 
@@ -156,12 +161,12 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
 
   @media (max-width: 991.98px) {
     display: none !important;
-    background: $primary-brand;
+    background: linear-gradient(135deg, $primary-brand 0%, darken($primary-brand, 5%) 100%);
     margin-top: 0.4rem;
     padding: 0.8rem;
-    border-radius: 10px;
-    box-shadow: 0 6px 18px $shadow-medium;
-    border: 1px solid $accent-yellow;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    border: 2px solid $accent-yellow;
     position: absolute;
     top: 100%;
     left: 0;
@@ -191,25 +196,44 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
   position: relative;
 }
 
+.dropdown-wrapper {
+  position: relative;
+}
+
 .nav-item .nav-link {
   color: $text-primary;
   font-size: 1rem;
   font-weight: 600;
   padding: 0.5rem 1rem;
-  border-radius: 20px;
+  border-radius: 25px;
   text-decoration: none;
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  transition: color 0.4s ease-in-out, background 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
+  transition: all 0.3s ease;
   white-space: nowrap;
   position: relative;
+  cursor: pointer;
+}
+
+.nav-item .nav-link.dropdown-toggle {
+  padding-left: 0.5rem;
 }
 
 .nav-item .nav-link i {
   font-size: 1rem;
   color: $accent-pink;
-  transition: color 0.4s ease-in-out;
+  transition: color 0.3s ease;
+}
+
+.dropdown-arrow {
+  font-size: 0.75rem !important;
+  margin-right: 0.2rem;
+  transition: transform 0.3s ease;
+
+  &.rotated {
+    transform: rotate(180deg);
+  }
 }
 
 .nav-item .nav-link::after {
@@ -220,28 +244,90 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
   width: 0;
   height: 3px;
   background: $accent-yellow;
-  transition: width 0.4s ease-in-out, right 0.4s ease-in-out;
+  transition: width 0.3s ease;
+  border-radius: 2px;
 }
 
 .nav-item .nav-link:hover,
-.nav-item .nav-link.router-link-active {
+.nav-item .nav-link.router-link-active,
+.nav-item .nav-link.active {
   background: $white;
   color: $primary-brand;
-  box-shadow: 0 3px 6px $shadow-medium;
+  box-shadow: 0 4px 8px $shadow-medium;
+  transform: translateY(-2px);
 }
 
 .nav-item .nav-link:hover i,
-.nav-item .nav-link.router-link-active i {
+.nav-item .nav-link.router-link-active i,
+.nav-item .nav-link.active i {
   color: $accent-yellow;
 }
 
-.nav-item .nav-link.router-link-active::after {
+.nav-item .nav-link.router-link-active::after,
+.nav-item .nav-link.active::after {
   width: 100%;
   right: 0;
 }
 
-.navbar-actions {
+// Dropdown Menu Styles
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background: $white;
+  border: 2px solid $accent-yellow;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem 0;
+  min-width: 200px;
+  z-index: 1000;
+  animation: fadeInDown 0.3s ease;
+
+  &.show {
+    display: block;
+  }
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
   gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  color: $primary-brand;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  i {
+    font-size: 1rem;
+    color: $accent-pink;
+    transition: color 0.3s ease;
+  }
+
+  &:hover {
+    background: linear-gradient(90deg, $accent-yellow, $button-hover);
+    color: $primary-brand;
+    padding-right: 1.5rem;
+
+    i {
+      color: $primary-brand;
+    }
+  }
+
+  &.active {
+    background: $primary-brand;
+    color: $white;
+
+    i {
+      color: $accent-yellow;
+    }
+  }
+}
+
+.navbar-actions {
+  gap: 0.6rem;
   position: absolute;
   left: 1rem;
 }
@@ -250,21 +336,42 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
   color: $text-primary;
   font-size: 0.9rem;
   font-weight: 600;
-  padding: 0.4rem 0.8rem;
-  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
   text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   transition: all 0.3s ease;
   background: $white;
-  border: 1px solid transparent;
-  box-shadow: 0 1px 3px $shadow-light;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 6px $shadow-light;
+  position: relative;
+}
+
+// Icon-only buttons for cart and favorite
+.navbar-actions .action-icon {
+  padding: 0.6rem;
+  width: 42px;
+  height: 42px;
+  justify-content: center;
+  border-radius: 50%;
+  position: relative;
+
+  i {
+    font-size: 1.1rem;
+    margin: 0;
+  }
+
+  .action-text {
+    display: none;
+  }
 }
 
 .navbar-actions .action-link i {
   font-size: 1rem;
   color: $accent-pink;
+  transition: color 0.3s ease;
 }
 
 .navbar-actions .action-link .action-text {
@@ -272,10 +379,30 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
   color: $primary-brand;
 }
 
+// Badge counter
+.badge-count {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  background: $danger-red;
+  color: $white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 10px;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid $white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 .navbar-actions .action-link:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.05);
   border-color: $accent-yellow;
-  color: $primary-brand;
+  box-shadow: 0 4px 12px $shadow-medium;
 }
 
 .navbar-actions .action-link:hover i {
@@ -299,6 +426,14 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
 .navbar-actions .action-link.login-btn {
   background: $white;
   color: $primary-brand;
+  border-radius: 25px;
+  padding: 0.5rem 1rem;
+  width: auto;
+  height: auto;
+
+  .action-text {
+    display: inline-block;
+  }
 }
 
 .navbar-actions .action-link.login-btn i {
@@ -348,22 +483,56 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
     margin: 0;
   }
 
-  .navbar-nav .nav-link {
+  .dropdown-wrapper {
+    width: 100%;
+  }
+
+  .nav-item .nav-link {
     justify-content: center;
     padding: 0.6rem;
     font-size: 1rem;
     color: $white;
     background: transparent;
+    width: 100%;
+  }
+
+  .dropdown-menu {
+    position: static;
+    border: none;
+    box-shadow: none;
+    background: rgba($white, 0.1);
+    margin-top: 0.5rem;
+    border-radius: 8px;
+  }
+
+  .dropdown-item {
+    color: $white;
+
+    &:hover {
+      background: rgba($white, 0.2);
+      color: $white;
+    }
+
+    &.active {
+      background: rgba($accent-yellow, 0.3);
+      color: $white;
+    }
+
+    i {
+      color: $accent-yellow;
+    }
   }
 
   .navbar-nav .nav-link:hover,
-  .navbar-nav .nav-link.router-link-active {
+  .navbar-nav .nav-link.router-link-active,
+  .navbar-nav .nav-link.active {
     background: $white;
     color: $primary-brand;
   }
 
   .navbar-nav .nav-link:hover i,
-  .navbar-nav .nav-link.router-link-active i {
+  .navbar-nav .nav-link.router-link-active i,
+  .navbar-nav .nav-link.active i {
     color: $accent-yellow;
   }
 
@@ -375,7 +544,8 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
     height: 2px;
   }
 
-  .navbar-nav .nav-link.router-link-active::after {
+  .navbar-nav .nav-link.router-link-active::after,
+  .navbar-nav .nav-link.active::after {
     width: 50%;
     left: 50%;
     transform: translateX(-50%);
@@ -383,7 +553,7 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
 
   .navbar-actions {
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.6rem;
     margin-top: 0.8rem;
     width: 100%;
     align-items: center;
@@ -394,6 +564,16 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
     padding: 0.6rem;
     width: 100%;
     max-width: 300px;
+  }
+
+  .navbar-actions .action-icon {
+    width: 100%;
+    border-radius: 25px;
+
+    .action-text {
+      display: inline-block !important;
+      margin-right: 0.5rem;
+    }
   }
 
   .navbar-brand .logo-img {
@@ -418,6 +598,17 @@ $shadow-medium: rgba(255, 255, 255, 0.15);
 }
 
 @keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
   from {
     opacity: 0;
     transform: translateY(-10px);

@@ -46,9 +46,79 @@ $gradient-magical: linear-gradient(135deg, $bright-orange, $happy-pink, $fun-pur
   100% { background-position: 0% 50%; }
 }
 
+@keyframes slideInBottom {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 :host {
   font-family: 'Tajawal', sans-serif;
   direction: rtl;
+  display: block;
+}
+
+* { box-sizing: border-box; }
+
+.toast-container {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 350px;
+
+  @media (max-width: 640px) {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    max-width: none;
+  }
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(8px);
+  animation: slideInBottom 0.25s ease-out;
+  min-width: 280px;
+  font-size: 14px;
+
+  @media (max-width: 640px) { min-width: auto; }
+
+  &.toast-success { background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; }
+  &.toast-error { background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); color: white; }
+  &.toast-info { background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); color: white; }
+
+  .toast-content { display: flex; align-items: center; gap: 8px; flex: 1; }
+  .toast-icon {
+    font-size: 16px;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .toast-message { font-weight: 500; line-height: 1.3; }
+  .toast-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 4px;
+    &:hover { background: rgba(255, 255, 255, 0.3); transform: scale(1.05); }
+  }
 }
 
 .hero-section {
@@ -524,6 +594,7 @@ $gradient-magical: linear-gradient(135deg, $bright-orange, $happy-pink, $fun-pur
             position: relative;
             transition: transform 0.3s ease;
             flex-shrink: 0;
+            background: $white;
 
             .book-slide {
               position: absolute;
@@ -586,6 +657,7 @@ $gradient-magical: linear-gradient(135deg, $bright-orange, $happy-pink, $fun-pur
               justify-content: center;
               gap: 0.5rem;
               margin-bottom: 0.5rem;
+              flex-wrap: wrap;
 
               .book-price {
                 font-size: 1.1rem;
@@ -593,12 +665,19 @@ $gradient-magical: linear-gradient(135deg, $bright-orange, $happy-pink, $fun-pur
                 color: $bright-orange;
               }
 
-              .price-badge {
+              .price-badge, .stock-badge {
                 background: $happy-pink;
                 color: $white;
                 padding: 0.25rem 0.5rem;
                 border-radius: 8px;
                 font-size: 0.65rem;
+              }
+
+              .stock-badge {
+                background: $grass-green;
+                &.out-of-stock {
+                  background: #EF4444;
+                }
               }
             }
 
@@ -622,14 +701,28 @@ $gradient-magical: linear-gradient(135deg, $bright-orange, $happy-pink, $fun-pur
                 position: relative;
                 transition: all 0.3s ease;
 
-                &.cart-button:hover {
-                  background: $accent-yellow;
-                  color: $white;
+                &.cart-button {
+                  &:hover:not(:disabled) {
+                    background: $accent-yellow;
+                    color: $white;
+                  }
+                  &:disabled {
+                    background: #D1D5DB;
+                    opacity: 0.7;
+                    cursor: not-allowed;
+                  }
                 }
 
-                &.favorite-button:hover {
-                  background: $happy-pink;
-                  color: $white;
+                &.favorite-button {
+                  &.active {
+                    background: $happy-pink;
+                    color: $white;
+                    animation: heartBeat 0.4s ease;
+                  }
+                  &:hover:not(.active) {
+                    background: rgba($happy-pink, 0.1);
+                    color: $happy-pink;
+                  }
                 }
 
                 .button-tooltip {
@@ -724,6 +817,17 @@ $gradient-magical: linear-gradient(135deg, $bright-orange, $happy-pink, $fun-pur
           }
         }
       }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 1.5rem;
+      background: $white;
+      border-radius: 16px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      .empty-icon { font-size: 4rem; margin-bottom: 1rem; opacity: 0.6; }
+      h3 { font-size: 1.5rem; color: $text-dark; margin: 0 0 0.5rem 0; font-weight: 600; }
+      p { color: $text-dark; margin: 0; font-size: 0.9375rem; opacity: 0.7; }
     }
   }
 }
@@ -928,6 +1032,12 @@ $gradient-magical: linear-gradient(135deg, $bright-orange, $happy-pink, $fun-pur
   }
 }
 
+@keyframes heartBeat {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.1); }
+  50% { transform: scale(1.05); }
+}
+
 @media (max-width: 991.98px) {
   .hero-section {
     height: 60vh;
@@ -1066,7 +1176,7 @@ $gradient-magical: linear-gradient(135deg, $bright-orange, $happy-pink, $fun-pur
                   font-size: 1rem;
                 }
 
-                .price-badge {
+                .price-badge, .stock-badge {
                   font-size: 0.6rem;
                 }
               }
@@ -1080,16 +1190,23 @@ $gradient-magical: linear-gradient(135deg, $bright-orange, $happy-pink, $fun-pur
               }
             }
           }
+        }
 
-          .slider-nav {
-            width: 36px;
-            height: 36px;
+        .slider-nav {
+          width: 36px;
+          height: 36px;
 
-            .nav-icon {
-              font-size: 1.1rem;
-            }
+          .nav-icon {
+            font-size: 1.1rem;
           }
         }
+      }
+
+      .empty-state {
+        padding: 3rem 1rem;
+        .empty-icon { font-size: 3rem; }
+        h3 { font-size: 1.3rem; }
+        p { font-size: 0.875rem; }
       }
     }
   }
@@ -1319,7 +1436,7 @@ $gradient-magical: linear-gradient(135deg, $bright-orange, $happy-pink, $fun-pur
                   font-size: 0.9rem;
                 }
 
-                .price-badge {
+                .price-badge, .stock-badge {
                   font-size: 0.55rem;
                 }
               }
@@ -1358,6 +1475,13 @@ $gradient-magical: linear-gradient(135deg, $bright-orange, $happy-pink, $fun-pur
             height: 7px;
           }
         }
+
+        .empty-state {
+          padding: 2.5rem 0.75rem;
+          .empty-icon { font-size: 3rem; }
+          h3 { font-size: 1.3rem; }
+          p { font-size: 0.875rem; }
+        }
       }
     }
   }
@@ -1383,6 +1507,8 @@ $gradient-magical: linear-gradient(135deg, $bright-orange, $happy-pink, $fun-pur
       }
 
       .contact-grid {
+        grid-template-columns: 1fr;
+
         .form-title,
         .details-title {
           font-size: 1.1rem;
@@ -1392,20 +1518,20 @@ $gradient-magical: linear-gradient(135deg, $bright-orange, $happy-pink, $fun-pur
           .form-group {
             input,
             textarea {
-              font-size: 0.8rem;
-              padding: 0.6rem;
+              font-size: 0.75rem;
+              padding: 0.5rem;
             }
           }
 
           .form-submit-button {
-            padding: 0.6rem 1.2rem;
-            font-size: 0.8rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
           }
         }
 
         .contact-info {
           .info-item {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
 
             i {
               font-size: 0.9rem;

@@ -2,6 +2,19 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
 
+<div class="toast-container">
+  <div *ngFor="let toast of toasts; trackBy: trackByToastId"
+       class="toast toast-{{toast.type}}">
+    <div class="toast-content">
+      <span class="toast-icon">
+        {{ toast.type === 'success' ? '✓' : toast.type === 'error' ? '✗' : 'ℹ' }}
+      </span>
+      <span class="toast-message">{{toast.message}}</span>
+    </div>
+    <button class="toast-close" (click)="removeToast(toast.id)">×</button>
+  </div>
+</div>
+
 <section class="hero-section" dir="rtl" lang="ar">
   <div class="hero-slider">
     <div class="hero-slide" style="background-image: url('/assets/images/home/heroimg2.jpg');"></div>
@@ -161,7 +174,7 @@
     <div class="books-slider-container">
       <div class="swiper books-slider">
         <div class="swiper-wrapper">
-          <div class="swiper-slide book-card">
+          <div *ngFor="let book of latestBooks; trackBy: trackByBookId" class="swiper-slide book-card">
             <div class="book-rating">
               <span class="star">⭐</span>
               <span class="star">⭐</span>
@@ -170,123 +183,34 @@
               <span class="star">⭐</span>
             </div>
             <div class="book-card-slideshow">
-              <div class="book-slide active" style="background-image: url('/assets/images/home/book3.jpg');"></div>
-              <div class="book-slide" style="background-image: url('/assets/images/home/book2.jpg');"></div>
-              <div class="book-slide" style="background-image: url('/assets/images/home/book1.jpg');"></div>
+              <div *ngFor="let img of book.imgs; let i = index"
+                   class="book-slide"
+                   [class.active]="activeSlides[book._id] === i"
+                   [style.background-image]="'url(' + getImageUrl(img) + ')'"></div>
             </div>
             <div class="book-content">
-              <div class="book-category-badge">🌳 مغامرات</div>
-              <h2 class="book-title">مغامرات في الغابة السحرية</h2>
-              <p class="book-description">انطلق في رحلة مثيرة مع الأصدقاء في الغابة المليئة بالأسرار</p>
+              <div class="book-category-badge">{{ getCategoryEmoji(book.category) }} {{ book.category }}</div>
+              <h2 class="book-title">{{ book.name }}</h2>
+              <p class="book-description">{{ book.description | slice:0:80 }}{{ book.description.length > 80 ? '...' : '' }}</p>
               <div class="book-price-container">
-                <span class="book-price">324.00 ج.م</span>
-                <span class="price-badge">عرض خاص</span>
+                <span class="book-price">{{ calculateBookFinalPrice(book) | number:'1.2-2' }} ج.م</span>
+                <span class="price-badge" *ngIf="hasDiscount(book)">خصم {{ book.offer }}%</span>
+                <span class="stock-badge" [class.out-of-stock]="book.stockStatus === 'outOfStock'">
+                  {{ book.stockStatus === 'inStock' ? 'متوفر' : 'غير متوفر' }}
+                </span>
               </div>
               <div class="book-actions">
-                <button class="action-button cart-button" aria-label="أضف إلى السلة" (click)="addToCart('مغامرات في الغابة السحرية')">
+                <button class="action-button cart-button"
+                        aria-label="أضف إلى السلة"
+                        (click)="addToCart(book)"
+                        [disabled]="book.stockStatus === 'outOfStock'">
                   <i class="fas fa-cart-plus"></i>
                   <span class="button-tooltip">أضف للسلة</span>
                 </button>
-                <button class="action-button favorite-button" aria-label="أضف إلى المفضلة" (click)="addToFavorites('مغامرات في الغابة السحرية')">
-                  <i class="fas fa-heart"></i>
-                  <span class="button-tooltip">المفضلة</span>
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="swiper-slide book-card">
-            <div class="book-rating">
-              <span class="star">⭐</span>
-              <span class="star">⭐</span>
-              <span class="star">⭐</span>
-              <span class="star">⭐</span>
-              <span class="star">⭐</span>
-            </div>
-            <div class="book-card-slideshow">
-              <div class="book-slide active" style="background-image: url('/assets/images/home/book2.jpg');"></div>
-              <div class="book-slide" style="background-image: url('/assets/images/home/book3.jpg');"></div>
-              <div class="book-slide" style="background-image: url('/assets/images/home/book2.jpg');"></div>
-            </div>
-            <div class="book-content">
-              <div class="book-category-badge">🌊 خيال</div>
-              <h2 class="book-title">أسرار البحر الأزرق</h2>
-              <p class="book-description">اكتشف عجائب البحار وتعرف على أصدقاء جدد تحت الماء</p>
-              <div class="book-price-container">
-                <span class="book-price">388.80 ج.م</span>
-                <span class="price-badge">الأكثر مبيعًا</span>
-              </div>
-              <div class="book-actions">
-                <button class="action-button cart-button" aria-label="أضف إلى السلة" (click)="addToCart('أسرار البحر الأزرق')">
-                  <i class="fas fa-cart-plus"></i>
-                  <span class="button-tooltip">أضف للسلة</span>
-                </button>
-                <button class="action-button favorite-button" aria-label="أضف إلى المفضلة" (click)="addToFavorites('أسرار البحر الأزرق')">
-                  <i class="fas fa-heart"></i>
-                  <span class="button-tooltip">المفضلة</span>
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="swiper-slide book-card">
-            <div class="book-rating">
-              <span class="star">⭐</span>
-              <span class="star">⭐</span>
-              <span class="star">⭐</span>
-              <span class="star">⭐</span>
-              <span class="star">⭐</span>
-            </div>
-            <div class="book-card-slideshow">
-              <div class="book-slide active" style="background-image: url('/assets/images/home/heroimg3.jpg');"></div>
-              <div class="book-slide" style="background-image: url('/assets/images/home/heroimg2.jpg');"></div>
-              <div class="book-slide" style="background-image: url('/assets/images/home/heroimg3.jpg');"></div>
-            </div>
-            <div class="book-content">
-              <div class="book-category-badge">🚀 علمي</div>
-              <h2 class="book-title">رحلة عبر الزمن</h2>
-              <p class="book-description">سافر عبر الزمن واكتشف أسرار الماضي والمستقبل</p>
-              <div class="book-price-container">
-                <span class="book-price">362.88 ج.م</span>
-                <span class="price-badge">جديد</span>
-              </div>
-              <div class="book-actions">
-                <button class="action-button cart-button" aria-label="أضف إلى السلة" (click)="addToCart('رحلة عبر الزمن')">
-                  <i class="fas fa-cart-plus"></i>
-                  <span class="button-tooltip">أضف للسلة</span>
-                </button>
-                <button class="action-button favorite-button" aria-label="أضف إلى المفضلة" (click)="addToFavorites('رحلة عبر الزمن')">
-                  <i class="fas fa-heart"></i>
-                  <span class="button-tooltip">المفضلة</span>
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="swiper-slide book-card">
-            <div class="book-rating">
-              <span class="star">⭐</span>
-              <span class="star">⭐</span>
-              <span class="star">⭐</span>
-              <span class="star">⭐</span>
-              <span class="star">⭐</span>
-            </div>
-            <div class="book-card-slideshow">
-              <div class="book-slide active" style="background-image: url('/assets/images/home/book1.jpg');"></div>
-              <div class="book-slide" style="background-image: url('/assets/images/home/book2.jpg');"></div>
-              <div class="book-slide" style="background-image: url('/assets/images/home/book3.jpg');"></div>
-            </div>
-            <div class="book-content">
-              <div class="book-category-badge">👵 تراثي</div>
-              <h2 class="book-title">حكايات الجدة الحكيمة</h2>
-              <p class="book-description">استمع لأجمل الحكايات التراثية المليئة بالحكمة والمرح</p>
-              <div class="book-price-container">
-                <span class="book-price">259.20 ج.م</span>
-                <span class="price-badge">مفضل الأطفال</span>
-              </div>
-              <div class="book-actions">
-                <button class="action-button cart-button" aria-label="أضف إلى السلة" (click)="addToCart('حكايات الجدة الحكيمة')">
-                  <i class="fas fa-cart-plus"></i>
-                  <span class="button-tooltip">أضف للسلة</span>
-                </button>
-                <button class="action-button favorite-button" aria-label="أضف إلى المفضلة" (click)="addToFavorites('حكايات الجدة الحكيمة')">
+                <button class="action-button favorite-button"
+                        aria-label="أضف إلى المفضلة"
+                        (click)="toggleFavorite(book)"
+                        [class.active]="isBookFavorited(book)">
                   <i class="fas fa-heart"></i>
                   <span class="button-tooltip">المفضلة</span>
                 </button>
@@ -295,13 +219,18 @@
           </div>
         </div>
       </div>
-      <button class="slider-nav next">
+      <button class="slider-nav next" *ngIf="latestBooks.length > 1">
         <span class="nav-icon">◀️</span>
       </button>
-      <button class="slider-nav prev">
+      <button class="slider-nav prev" *ngIf="latestBooks.length > 1">
         <span class="nav-icon">▶️</span>
       </button>
-      <div class="swiper-pagination"></div>
+      <div class="swiper-pagination" *ngIf="latestBooks.length > 1"></div>
+    </div>
+    <div class="empty-state" *ngIf="latestBooks.length === 0">
+      <div class="empty-icon">📚</div>
+      <h3>لا توجد كتب</h3>
+      <p>لم يتم العثور على كتب جديدة حالياً. تحقق لاحقاً!</p>
     </div>
   </div>
 </section>

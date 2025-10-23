@@ -19,9 +19,87 @@ $breakpoint-desktop: 992px;
   padding: 1rem;
   direction: rtl;
   min-height: 100vh;
+  position: relative;
 
   @media (min-width: $breakpoint-tablet) {
     padding: 2rem;
+  }
+
+  .message-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+
+    .message-box {
+      background: $white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px $shadow-dark;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+
+      &.success {
+        border: 2px solid $grass-green;
+      }
+
+      &.error {
+        border: 2px solid $happy-pink;
+      }
+
+      &.confirm {
+        border: 2px solid $accent-yellow;
+      }
+
+      p {
+        font-size: clamp(1rem, 2.5vw, 1.2rem);
+        color: $text-dark;
+        margin-bottom: 1rem;
+      }
+
+      .confirm-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+
+        .action-button {
+          padding: 0.7rem 1.5rem;
+          font-size: clamp(0.9rem, 2vw, 1rem);
+          font-weight: 600;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &.cancel-button {
+            background: $happy-pink;
+            color: $white;
+
+            &:hover {
+              background: darken($happy-pink, 10%);
+              transform: scale(1.05);
+            }
+          }
+
+          &:not(.cancel-button) {
+            background: $primary-brand;
+            color: $white;
+
+            &:hover {
+              background: $bright-orange;
+              transform: scale(1.05);
+            }
+          }
+        }
+      }
+    }
   }
 
   .row {
@@ -89,7 +167,7 @@ $breakpoint-desktop: 992px;
   }
 
   .navigate-button {
-    display: none; /* Hide by default */
+    display: none;
     padding: 0.8rem 1.5rem;
     font-size: clamp(0.9rem, 2vw, 1rem);
     font-weight: 600;
@@ -103,8 +181,8 @@ $breakpoint-desktop: 992px;
     text-align: center;
 
     @media (max-width: $breakpoint-desktop) {
-      display: inline-block; /* Show on mobile */
-      width: 100%; /* Full width on mobile */
+      display: inline-block;
+      width: 100%;
     }
 
     &:hover {
