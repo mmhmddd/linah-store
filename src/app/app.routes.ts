@@ -13,12 +13,16 @@ import { DashboardComponent } from './dashboard/dashboard/dashboard.component';
 import { BooksControlComponent } from './dashboard/books-control/books-control.component';
 import { UsersControlComponent } from './dashboard/users-control/users-control.component';
 import { OrdersControlComponent } from './dashboard/orders-control/orders-control.component';
+import { AllBooksComponent } from './features/all-books/all-books.component';
+import { ChildrenStoriesComponent } from './features/children-stories/children-stories.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, title: 'LinaStore | Home' },
   { path: 'about', component: AboutComponent, title: 'LinaStore | About Us' },
   { path: 'contact', component: ContactComponent, title: 'LinaStore | Contact' },
-  { path: 'all-books', component: ChildrenBooksComponent, title: 'LinaStore | All Books' },
+  { path: 'all-books', component: AllBooksComponent, title: 'LinaStore | All Books' },
+  { path: 'children-books', component: ChildrenBooksComponent, title: 'LinaStore | Children Books' },
+  { path: 'children-stories', component: ChildrenStoriesComponent, title: 'LinaStore | Children stories' },
   { path: 'book/:id', component: BookDetailsComponent, title: 'LinaStore | Book Details' },
   { path: 'cart', component: CartComponent, title: 'LinaStore | Cart' },
   { path: 'favourite', component: FavouriteComponent, title: 'LinaStore | Favourite' },

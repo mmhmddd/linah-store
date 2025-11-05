@@ -17,10 +17,10 @@
 
     <div class="alert error" *ngIf="errorMessage">
       <div class="alert-content">
-        <span class="alert-icon">⚠</span>
+        <span class="alert-icon">Warning</span>
         <span class="alert-text">{{ errorMessage }}</span>
       </div>
-      <button class="close-alert" (click)="errorMessage = null">✕</button>
+      <button class="close-alert" (click)="errorMessage = null">×</button>
     </div>
 
     <div class="loading-overlay" *ngIf="isLoading">
@@ -30,10 +30,11 @@
       </div>
     </div>
 
+    <!-- نموذج الإضافة/التعديل -->
     <div class="form-container" *ngIf="showForm">
       <div class="form-header">
         <h2>{{ editingBookId ? 'تعديل الكتاب' : 'إضافة كتاب جديد' }}</h2>
-        <button class="close-form-btn" (click)="cancelForm()">✕</button>
+        <button class="close-form-btn" (click)="cancelForm()">×</button>
       </div>
 
       <form [formGroup]="bookForm" (ngSubmit)="submitBook()">
@@ -68,12 +69,14 @@
 
             <div class="form-group">
               <label for="category">الفئة <span class="required">*</span></label>
-              <input
+              <select
                 id="category"
                 formControlName="category"
-                type="text"
-                placeholder="أدخل الفئة"
-                [class.error]="bookForm.get('category')?.touched && bookForm.get('category')?.invalid" />
+                [class.error]="bookForm.get('category')?.touched && bookForm.get('category')?.invalid">
+                <option value="" disabled>اختر الفئة</option>
+                <option value="كتاب اطفال">كتاب اطفال</option>
+                <option value="قصص أطفال">قصص أطفال</option>
+              </select>
               <div class="error-message" *ngIf="bookForm.get('category')?.touched && bookForm.get('category')?.invalid">
                 الفئة مطلوبة
               </div>
@@ -132,7 +135,9 @@
               <label>السعر بعد الخصم</label>
               <div class="price-display">
                 <span class="final-price">{{ calculateFinalPrice() | number:'1.2-2' }} جنيه</span>
-                <span class="original-price" *ngIf="bookForm.get('offer')?.value > 0">{{ bookForm.get('price')?.value | number:'1.2-2' }}</span>
+                <span class="original-price" *ngIf="bookForm.get('offer')?.value > 0">
+                  {{ bookForm.get('price')?.value | number:'1.2-2' }}
+                </span>
               </div>
             </div>
           </div>
@@ -162,7 +167,7 @@
                 (change)="onFileChange($event)"
                 #fileInput />
               <label for="imgs" class="file-upload-label">
-                <span class="upload-icon">📷</span>
+                <span class="upload-icon">Camera</span>
                 <span class="upload-text">اضغط لاختيار الصور</span>
                 <span class="upload-hint">حد أقصى 5 صور (JPEG, PNG, GIF, WebP)</span>
               </label>
@@ -170,9 +175,9 @@
 
             <div class="image-preview-grid" *ngIf="selectedFiles.length > 0">
               <div *ngFor="let file of selectedFiles; let i = index" class="preview-card">
-                <img [src]="file.preview" alt="Preview" class="preview-img" />
+                <img [src]="file.preview" alt="Preview" class="preview-img" (error)="handleImageError(i)" />
                 <button type="button" class="remove-img" (click)="removeImage(i)">
-                  <span>✕</span>
+                  <span>×</span>
                 </button>
                 <div class="image-overlay">
                   <span class="image-number">{{ i + 1 }}</span>
@@ -193,6 +198,7 @@
       </form>
     </div>
 
+    <!-- قائمة الكتب -->
     <div class="books-list-section" *ngIf="!showForm">
       <div class="section-header">
         <h2 class="section-title-main">قائمة الكتب</h2>
@@ -207,7 +213,8 @@
           <label for="categoryFilter">الفئة</label>
           <select id="categoryFilter" [(ngModel)]="categoryFilter" (change)="filterBooks()">
             <option value="">جميع الفئات</option>
-            <option *ngFor="let category of uniqueCategories" [value]="category">{{ category }}</option>
+            <option value="كتاب اطفال">كتاب اطفال</option>
+            <option value="قصص أطفال">قصص أطفال</option>
           </select>
         </div>
 
@@ -239,6 +246,7 @@
                 [alt]="book.name"
                 class="book-image"
                 (error)="handleImageError(-1, book._id)"
+                (load)="onImageLoad(book.imgs[0])"
                 loading="lazy" />
               <div class="stock-badge" [class.out-of-stock]="book.stockStatus === 'outOfStock'">
                 {{ book.stockStatus === 'inStock' ? 'متوفر' : 'غير متوفر' }}
@@ -252,7 +260,7 @@
                 *ngFor="let img of book.imgs.slice(0, 4); let i = index"
                 class="thumbnail-small"
                 (click)="openImageModal(img)">
-                <img [src]="getImageUrl(img)" [alt]="book.name" />
+                <img [src]="getImageUrl(img)" [alt]="book.name" (error)="handleImageError(-1, book._id)" />
               </div>
               <div class="more-images" *ngIf="book.imgs.length > 4" (click)="openImageModal(book.imgs[0])">
                 +{{ book.imgs.length - 4 }}
@@ -293,19 +301,19 @@
 
           <div class="book-actions">
             <button class="action-btn edit" (click)="editBook(book)">
-              <span class="action-icon">✏️</span>
+              <span class="action-icon">Edit</span>
               <span>تعديل</span>
             </button>
             <button class="action-btn delete" (click)="openDeleteModal(book._id!)">
-              <span class="action-icon">🗑️</span>
+              <span class="action-icon">Trash</span>
               <span>حذف</span>
             </button>
             <button class="action-btn offer" (click)="openOfferModal(book._id!, book.offer)">
-              <span class="action-icon">🏷️</span>
+              <span class="action-icon">Tag</span>
               <span>خصم</span>
             </button>
             <button class="action-btn stock" (click)="openStockModal(book._id!, book.quantity)">
-              <span class="action-icon">📦</span>
+              <span class="action-icon">Box</span>
               <span>مخزون</span>
             </button>
           </div>
@@ -313,20 +321,21 @@
       </div>
 
       <div class="empty-state" *ngIf="filteredBooks.length === 0">
-        <div class="empty-icon">📚</div>
+        <div class="empty-icon">Books</div>
         <h3>لا توجد كتب</h3>
         <p>لم يتم العثور على أي كتب. جرب تغيير الفلاتر أو أضف كتاباً جديداً.</p>
       </div>
     </div>
   </main>
 
+  <!-- معرض الصور -->
   <div class="modal" *ngIf="imageModalUrls && imageModalUrls.length > 0" (click)="imageModalUrls = null">
     <div class="modal-content large" (click)="$event.stopPropagation()">
-      <button class="close-modal" (click)="imageModalUrls = null">✕</button>
+      <button class="close-modal" (click)="imageModalUrls = null">×</button>
       <div class="carousel">
         <img [src]="getImageUrl(imageModalUrls[currentImageIndex])" alt="Full-size Image" class="modal-image" />
-        <button class="carousel-btn prev" *ngIf="imageModalUrls.length > 1" (click)="prevImage()">❮</button>
-        <button class="carousel-btn next" *ngIf="imageModalUrls.length > 1" (click)="nextImage()">❯</button>
+        <button class="carousel-btn prev" *ngIf="imageModalUrls.length > 1" (click)="prevImage()">Previous</button>
+        <button class="carousel-btn next" *ngIf="imageModalUrls.length > 1" (click)="nextImage()">Next</button>
         <div class="carousel-indicators" *ngIf="imageModalUrls.length > 1">
           <span
             *ngFor="let img of imageModalUrls; let i = index"
@@ -338,9 +347,10 @@
     </div>
   </div>
 
+  <!-- نافذة الحذف -->
   <div class="modal" *ngIf="deleteModalId" (click)="deleteModalId = null">
     <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-icon delete-icon">🗑️</div>
+      <div class="modal-icon delete-icon">Trash</div>
       <h2>تأكيد الحذف</h2>
       <p>هل أنت متأكد من حذف هذا الكتاب؟ لا يمكن التراجع عن هذا الإجراء.</p>
       <div class="modal-actions">
@@ -350,19 +360,14 @@
     </div>
   </div>
 
+  <!-- نافذة الخصم -->
   <div class="modal" *ngIf="offerModalId" (click)="offerModalId = null">
     <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-icon offer-icon">🏷️</div>
+      <div class="modal-icon offer-icon">Tag</div>
       <h2>إضافة خصم</h2>
       <div class="form-group">
         <label for="offerInput">نسبة الخصم (%)</label>
-        <input
-          id="offerInput"
-          type="number"
-          [(ngModel)]="offerModalValue"
-          min="0"
-          max="100"
-          placeholder="أدخل نسبة الخصم" />
+        <input id="offerInput" type="number" [(ngModel)]="offerModalValue" min="0" max="100" placeholder="أدخل نسبة الخصم" />
         <div class="error-message" *ngIf="offerModalValue < 0 || offerModalValue > 100">
           نسبة الخصم يجب أن تكون بين 0 و100
         </div>
@@ -374,18 +379,14 @@
     </div>
   </div>
 
+  <!-- نافذة المخزون -->
   <div class="modal" *ngIf="stockModalId" (click)="stockModalId = null">
     <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-icon stock-icon">📦</div>
+      <div class="modal-icon stock-icon">Box</div>
       <h2>تحديث المخزون</h2>
       <div class="form-group">
         <label for="stockInput">الكمية المتوفرة</label>
-        <input
-          id="stockInput"
-          type="number"
-          [(ngModel)]="stockModalValue"
-          min="0"
-          placeholder="أدخل الكمية" />
+        <input id="stockInput" type="number" [(ngModel)]="stockModalValue" min="0" placeholder="أدخل الكمية" />
         <div class="error-message" *ngIf="stockModalValue < 0">
           الكمية يجب أن تكون 0 أو أكثر
         </div>

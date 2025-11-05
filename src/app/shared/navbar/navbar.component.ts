@@ -19,7 +19,7 @@ export class NavbarComponent implements OnInit {
     { link: '/about', text: 'من نحن', icon: 'bi-info-circle-fill', hasDropdown: false },
     {
       link: '/all-books',
-      text: 'جميع الكتب',
+      text: 'المنتجات',
       icon: 'bi-book-fill',
       hasDropdown: true,
       subMenu: [

@@ -1,4 +1,4 @@
-// src/app/features/children-books/children-books.component.ts
+// src/app/features/all-books/all-books.component.ts
 import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -16,20 +16,20 @@ interface Toast {
 }
 
 @Component({
-  selector: 'app-children-books-and-stories',
+  selector: 'app-all-books',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './children-books.component.html',
-  styleUrls: ['./children-books.component.scss']
+  templateUrl: './all-books.component.html',
+  styleUrls: ['./all-books.component.scss']
 })
-export class ChildrenBooksComponent implements OnInit, OnDestroy {
+export class AllBooksComponent implements OnInit, OnDestroy {
   books: Book[] = [];
   filteredBooks: Book[] = [];
-  categories: string[] = ['كتاب اطفال'];
+  categories: string[] = [];
   imageModalUrls: string[] | null = null;
   currentImageIndex = 0;
   stockFilter = '';
-  categoryFilter = 'كتاب اطفال'; // Fixed
+  categoryFilter = '';
   sortBy = 'name';
   searchTerm = '';
   fallbackImage = '/assets/images/fallback.jpg';
@@ -47,7 +47,7 @@ export class ChildrenBooksComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.loadChildrenBooks();
+    this.loadAllBooks();
     this.loadCartItems();
     this.initializeFavorites();
   }
@@ -56,22 +56,22 @@ export class ChildrenBooksComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  private loadChildrenBooks(): void {
+  private loadAllBooks(): void {
     this.booksService.getAllBooks().pipe(
       retry(2),
       catchError(err => {
-        this.showToast('فشل في تحميل كتب الأطفال', 'error');
+        this.showToast('فشل في تحميل الكتب', 'error');
         return throwError(() => err);
       })
     ).subscribe(books => {
-      const childrenBooks = books.filter(b => b.category === 'كتاب اطفال');
-      childrenBooks.forEach(book => {
+      books.forEach(book => {
         book.imgs = Array.isArray(book.imgs) ? book.imgs : [];
         book.stockStatus = book.quantity > 0 ? 'inStock' : 'outOfStock';
       });
-      this.books = childrenBooks;
-      this.filteredBooks = [...childrenBooks];
-      this.sortBooks();
+      this.books = books;
+      this.filteredBooks = [...books];
+      this.categories = [...new Set(books.map(b => b.category))];
+      this.filterBooks();
       this.cdr.detectChanges();
     });
   }
@@ -210,24 +210,29 @@ export class ChildrenBooksComponent implements OnInit, OnDestroy {
 
   getCategoryEmoji(category: string): string {
     const map: { [key: string]: string } = {
-      'كتاب اطفال': 'كتاب',
-      'قصص': 'كتاب',
-      'خيال': 'خيال',
-      'مغامرات': 'صاروخ',
-      'علوم': 'مجهر',
-      'تعليمي': 'قبعة تخرج',
-      'أطفال': 'طفل'
+      'خيال': '✨',
+      'مغامرات': '🚀',
+      'علوم': '🔬',
+      'قصص': '📖',
+      'تعليمي': '🎓',
+      'فنون': '🎨',
+      'أطفال': '👶',
+      'تاريخ': '📜',
+      'رياضيات': '🔢',
+      'لغة': '✍️',
+      'تراثي': '👵'
     };
-    return map[category] || 'كتاب';
+    return map[category] || '📚';
   }
 
   filterBooks(): void {
     this.filteredBooks = this.books.filter(book => {
+      const cat = !this.categoryFilter || book.category === this.categoryFilter;
+      const stock = !this.stockFilter || book.stockStatus === this.stockFilter;
       const search = !this.searchTerm ||
         book.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         book.title?.toLowerCase().includes(this.searchTerm.toLowerCase());
-      const stock = !this.stockFilter || book.stockStatus === this.stockFilter;
-      return search && stock;
+      return cat && stock && search;
     });
     this.sortBooks();
     this.cdr.detectChanges();

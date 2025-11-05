@@ -121,4 +121,10 @@ export class BooksService {
       { headers: this.getHeaders() }
     );
   }
+  getBooksByCategory(category: string): Observable<Book[]> {
+    return this.http.get<Book[]>(
+      `${this.apiUrl}${API_ENDPOINTS.books.getAll}?category=${encodeURIComponent(category)}`,
+      { headers: this.getHeaders() }
+    );
+  }
 }

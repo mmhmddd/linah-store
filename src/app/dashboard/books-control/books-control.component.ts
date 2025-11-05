@@ -20,22 +20,26 @@ export class BooksControlComponent implements OnInit {
   bookForm: FormGroup;
   showForm = false;
   editingBookId: string | null = null;
-  selectedFiles: { file: File | null, preview: string }[] = [];
+  selectedFiles: { file: File | null; preview: string }[] = [];
   errorMessage: string | null = null;
   imageError: string | null = null;
   isLoading = false;
   imageModalUrls: string[] | null = null;
-  currentImageIndex: number = 0;
+  currentImageIndex = 0;
   deleteModalId: string | null = null;
   offerModalId: string | null = null;
-  offerModalValue: number = 0;
+  offerModalValue = 0;
   stockModalId: string | null = null;
-  stockModalValue: number = 0;
-  categoryFilter: string = '';
-  stockFilter: string = '';
-  sortBy: string = 'name';
-  uniqueCategories: string[] = [];
-  fallbackImage: string = '/assets/images/fallback.jpg';
+  stockModalValue = 0;
+  categoryFilter = '';
+  stockFilter = '';
+  sortBy = 'name';
+
+  // الفئات المسموح بها (بالألف الممدودة)
+  readonly allowedCategories = ['كتاب اطفال', 'قصص أطفال'];
+  uniqueCategories = this.allowedCategories;
+
+  fallbackImage = '/assets/images/fallback.jpg';
   private loadingImages = new Map<string, boolean>();
 
   constructor(
@@ -46,9 +50,9 @@ export class BooksControlComponent implements OnInit {
     this.bookForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(1)]],
       title: ['', [Validators.required, Validators.minLength(1)]],
-      category: ['', [Validators.required, Validators.minLength(1)]],
+      category: ['', [Validators.required]],
       code: [''],
-      price: [0, [Validators.required, Validators.min(0)]],
+      price: [0, [Validators.required, Validators.min(0.01)]],
       quantity: [0, [Validators.required, Validators.min(0)]],
       description: [''],
       offer: [0, [Validators.min(0), Validators.max(100)]],
@@ -64,13 +68,18 @@ export class BooksControlComponent implements OnInit {
     this.booksService.getAllBooks().subscribe({
       next: (books) => {
         books.forEach(book => {
-          if (!Array.isArray(book.imgs)) {
-            book.imgs = [];
+          if (!Array.isArray(book.imgs)) book.imgs = [];
+
+          // تصحيح الفئة من "قصص الطفال" إلى "قصص أطفال"
+          if (book.category === 'قصص الطفال') {
+            book.category = 'قصص أطفال';
+          } else if (!this.allowedCategories.includes(book.category)) {
+            book.category = this.allowedCategories[0];
           }
         });
+
         this.books = books;
         this.filteredBooks = [...books];
-        this.uniqueCategories = [...new Set(books.map(book => book.category))];
         this.sortBooks();
         this.isLoading = false;
         this.errorMessage = null;
@@ -80,40 +89,23 @@ export class BooksControlComponent implements OnInit {
         this.errorMessage = 'خطأ في تحميل الكتب: ' + (err.error?.message || err.message || 'غير معروف');
         this.isLoading = false;
         this.cdr.detectChanges();
-      },
+      }
     });
   }
 
   getImageUrl(img: string): string {
-    if (!img) {
-      return this.fallbackImage;
-    }
-
-    if (img.startsWith('http://') || img.startsWith('https://')) {
-      return img;
-    }
-
+    if (!img) return this.fallbackImage;
+    if (img.startsWith('http')) return img;
     const baseUrl = environment.apiUrl.replace('/api', '');
-
-    if (img.startsWith('/uploads')) {
-      return `${baseUrl}${img}`;
-    }
-
-    if (!img.startsWith('/')) {
-      return `${baseUrl}/uploads/${img}`;
-    }
-
-    return `${baseUrl}${img}`;
+    return img.startsWith('/uploads') ? `${baseUrl}${img}` : `${baseUrl}/uploads/${img}`;
   }
 
   isImageLoading(img: string): boolean {
-    const url = this.getImageUrl(img);
-    return this.loadingImages.get(url) === true;
+    return this.loadingImages.get(this.getImageUrl(img)) === true;
   }
 
   onImageLoad(img: string) {
-    const url = this.getImageUrl(img);
-    this.loadingImages.set(url, false);
+    this.loadingImages.set(this.getImageUrl(img), false);
     this.cdr.detectChanges();
   }
 
@@ -122,13 +114,12 @@ export class BooksControlComponent implements OnInit {
       this.selectedFiles[index].preview = this.fallbackImage;
       this.selectedFiles = [...this.selectedFiles];
     }
-
-    const book = bookId ? this.books.find(b => b._id === bookId) : null;
-    if (book && book.imgs[0]) {
-      const url = this.getImageUrl(book.imgs[0]);
-      this.loadingImages.set(url, false);
+    if (bookId) {
+      const book = this.books.find(b => b._id === bookId);
+      if (book?.imgs[0]) {
+        this.loadingImages.set(this.getImageUrl(book.imgs[0]), false);
+      }
     }
-
     this.cdr.detectChanges();
   }
 
@@ -146,14 +137,7 @@ export class BooksControlComponent implements OnInit {
     this.showForm = true;
     this.editingBookId = null;
     this.bookForm.reset({
-      name: '',
-      title: '',
-      category: '',
-      code: '',
-      price: 0,
-      quantity: 0,
-      description: '',
-      offer: 0,
+      name: '', title: '', category: '', code: '', price: 0, quantity: 0, description: '', offer: 0
     });
     this.selectedFiles = [];
     this.errorMessage = null;
@@ -163,10 +147,14 @@ export class BooksControlComponent implements OnInit {
   editBook(book: Book) {
     this.showForm = true;
     this.editingBookId = book._id!;
-    this.bookForm.reset({
+
+    // تصحيح الفئة عند التعديل
+    const correctedCategory = book.category === 'قصص الطفال' ? 'قصص أطفال' : book.category;
+
+    this.bookForm.patchValue({
       name: book.name,
       title: book.title,
-      category: book.category,
+      category: this.allowedCategories.includes(correctedCategory) ? correctedCategory : this.allowedCategories[0],
       code: book.code || '',
       price: book.price,
       quantity: book.quantity,
@@ -174,11 +162,7 @@ export class BooksControlComponent implements OnInit {
       offer: book.offer || 0,
     });
 
-    this.selectedFiles = book.imgs.map(img => ({
-      file: null,
-      preview: this.getImageUrl(img)
-    }));
-
+    this.selectedFiles = book.imgs.map(img => ({ file: null, preview: this.getImageUrl(img) }));
     this.errorMessage = null;
     this.imageError = null;
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -187,47 +171,41 @@ export class BooksControlComponent implements OnInit {
   onFileChange(event: Event) {
     this.imageError = null;
     const input = event.target as HTMLInputElement;
-    if (input.files) {
-      const files = Array.from(input.files).slice(0, 5 - this.selectedFiles.length);
+    if (!input.files) return;
 
-      if (files.length + this.selectedFiles.length > 5) {
-        this.imageError = 'الحد الأقصى 5 صور';
+    const files = Array.from(input.files).slice(0, 5 - this.selectedFiles.length);
+    if (files.length + this.selectedFiles.length > 5) {
+      this.imageError = 'الحد الأقصى 5 صور';
+      return;
+    }
+
+    for (const file of files) {
+      if (file.size > 5 * 1024 * 1024) {
+        this.imageError = `حجم الصورة "${file.name}" يجب أن يكون أقل من 5 ميجابايت`;
         return;
       }
-
-      for (const file of files) {
-        if (file.size > 5 * 1024 * 1024) {
-          this.imageError = `حجم الصورة "${file.name}" يجب أن يكون أقل من 5 ميجابايت`;
-          return;
-        }
-
-        if (!['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)) {
-          this.imageError = `الصورة "${file.name}" يجب أن تكون من نوع JPEG، PNG، GIF، أو WebP`;
-          return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = () => {
-          this.selectedFiles.push({ file, preview: reader.result as string });
-          this.selectedFiles = [...this.selectedFiles];
-          this.cdr.detectChanges();
-        };
-        reader.readAsDataURL(file);
+      if (!['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)) {
+        this.imageError = `الصورة "${file.name}" يجب أن تكون من نوع JPEG، PNG، GIF، أو WebP`;
+        return;
       }
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.selectedFiles.push({ file, preview: reader.result as string });
+        this.selectedFiles = [...this.selectedFiles];
+        this.cdr.detectChanges();
+      };
+      reader.readAsDataURL(file);
     }
   }
 
   removeImage(index: number) {
     this.selectedFiles.splice(index, 1);
     this.selectedFiles = [...this.selectedFiles];
-    this.imageError = null;
     this.cdr.detectChanges();
   }
 
   isSubmitDisabled(): boolean {
-    if (this.bookForm.invalid) return true;
-    if (!this.editingBookId && this.selectedFiles.length === 0) return true;
-    return false;
+    return this.bookForm.invalid || (!this.editingBookId && this.selectedFiles.length === 0);
   }
 
   submitBook() {
@@ -239,7 +217,7 @@ export class BooksControlComponent implements OnInit {
     const bookData: Partial<Book> = {
       name: this.bookForm.value.name.trim(),
       title: this.bookForm.value.title.trim(),
-      category: this.bookForm.value.category.trim(),
+      category: this.bookForm.value.category,
       code: this.bookForm.value.code?.trim() || '',
       price: Number(this.bookForm.value.price),
       quantity: Number(this.bookForm.value.quantity),
@@ -251,39 +229,29 @@ export class BooksControlComponent implements OnInit {
 
     this.isLoading = true;
 
-    if (this.editingBookId) {
-      this.booksService.updateBook(this.editingBookId, bookData, files).subscribe({
-        next: () => {
-          this.loadBooks();
-          this.showForm = false;
-          this.bookForm.reset();
-          this.selectedFiles = [];
-          this.errorMessage = null;
-          this.isLoading = false;
-        },
-        error: (err) => {
-          this.errorMessage = 'خطأ في تحديث الكتاب: ' + (err.error?.message || err.message || 'غير معروف');
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        },
-      });
-    } else {
-      this.booksService.createBook(bookData, files).subscribe({
-        next: () => {
-          this.loadBooks();
-          this.showForm = false;
-          this.bookForm.reset();
-          this.selectedFiles = [];
-          this.errorMessage = null;
-          this.isLoading = false;
-        },
-        error: (err) => {
-          this.errorMessage = 'خطأ في إضافة الكتاب: ' + (err.error?.message || err.message || 'غير معروف');
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        },
-      });
-    }
+    const action = this.editingBookId
+      ? this.booksService.updateBook(this.editingBookId, bookData, files)
+      : this.booksService.createBook(bookData, files);
+
+    action.subscribe({
+      next: () => this.resetAndReload(),
+      error: (err) => this.handleError(this.editingBookId ? 'تحديث' : 'إض648', err)
+    });
+  }
+
+  private resetAndReload() {
+    this.loadBooks();
+    this.showForm = false;
+    this.bookForm.reset();
+    this.selectedFiles = [];
+    this.errorMessage = null;
+    this.isLoading = false;
+  }
+
+  private handleError(action: string, err: any) {
+    this.errorMessage = `خطأ في ${action} الكتاب: ` + (err.error?.message || err.message || 'غير معروف');
+    this.isLoading = false;
+    this.cdr.detectChanges();
   }
 
   cancelForm() {
@@ -293,115 +261,54 @@ export class BooksControlComponent implements OnInit {
     this.selectedFiles = [];
     this.errorMessage = null;
     this.imageError = null;
-    this.cdr.detectChanges();
   }
 
-  openDeleteModal(id: string) {
-    this.deleteModalId = id;
-    this.errorMessage = null;
-    this.cdr.detectChanges();
-  }
-
+  openDeleteModal(id: string) { this.deleteModalId = id; }
   confirmDelete() {
-    if (this.deleteModalId) {
-      this.isLoading = true;
-      this.booksService.deleteBook(this.deleteModalId).subscribe({
-        next: () => {
-          this.loadBooks();
-          this.deleteModalId = null;
-          this.errorMessage = null;
-          this.isLoading = false;
-        },
-        error: (err) => {
-          this.errorMessage = 'خطأ في حذف الكتاب: ' + (err.error?.message || err.message || 'غير معروف');
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        },
-      });
-    }
+    if (!this.deleteModalId) return;
+    this.isLoading = true;
+    this.booksService.deleteBook(this.deleteModalId).subscribe({
+      next: () => { this.loadBooks(); this.deleteModalId = null; this.isLoading = false; },
+      error: (err) => this.handleError('حذف', err)
+    });
   }
 
-  openOfferModal(id: string, currentOffer: number) {
-    this.offerModalId = id;
-    this.offerModalValue = currentOffer;
-    this.errorMessage = null;
-    this.cdr.detectChanges();
-  }
-
+  openOfferModal(id: string, offer: number) { this.offerModalId = id; this.offerModalValue = offer; }
   confirmOffer() {
-    if (this.offerModalId && this.offerModalValue >= 0 && this.offerModalValue <= 100) {
-      this.isLoading = true;
-      this.booksService.addOffer(this.offerModalId, this.offerModalValue).subscribe({
-        next: () => {
-          this.loadBooks();
-          this.offerModalId = null;
-          this.errorMessage = null;
-          this.isLoading = false;
-        },
-        error: (err) => {
-          this.errorMessage = 'خطأ في إضافة العرض: ' + (err.error?.message || err.message || 'غير معروف');
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        },
-      });
-    }
+    if (!this.offerModalId || this.offerModalValue < 0 || this.offerModalValue > 100) return;
+    this.isLoading = true;
+    this.booksService.addOffer(this.offerModalId, this.offerModalValue).subscribe({
+      next: () => { this.loadBooks(); this.offerModalId = null; this.isLoading = false; },
+      error: (err) => this.handleError('إضافة العرض', err)
+    });
   }
 
-  openStockModal(id: string, currentQuantity: number) {
-    this.stockModalId = id;
-    this.stockModalValue = currentQuantity;
-    this.errorMessage = null;
-    this.cdr.detectChanges();
-  }
-
+  openStockModal(id: string, qty: number) { this.stockModalId = id; this.stockModalValue = qty; }
   confirmStock() {
-    if (this.stockModalId && this.stockModalValue >= 0) {
-      this.isLoading = true;
-      this.booksService.setStockStatus(this.stockModalId, this.stockModalValue).subscribe({
-        next: () => {
-          this.loadBooks();
-          this.stockModalId = null;
-          this.errorMessage = null;
-          this.isLoading = false;
-        },
-        error: (err) => {
-          this.errorMessage = 'خطأ في تحديث المخزون: ' + (err.error?.message || err.message || 'غير معروف');
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        },
-      });
-    }
+    if (!this.stockModalId || this.stockModalValue < 0) return;
+    this.isLoading = true;
+    this.booksService.setStockStatus(this.stockModalId, this.stockModalValue).subscribe({
+      next: () => { this.loadBooks(); this.stockModalId = null; this.isLoading = false; },
+      error: (err) => this.handleError('تحديث المخزون', err)
+    });
   }
 
   openImageModal(img: string) {
     const book = this.books.find(b => b.imgs.includes(img));
     this.imageModalUrls = book ? book.imgs : [img];
     this.currentImageIndex = book ? book.imgs.indexOf(img) : 0;
-    this.cdr.detectChanges();
   }
 
-  prevImage() {
-    if (this.imageModalUrls && this.currentImageIndex > 0) {
-      this.currentImageIndex--;
-      this.cdr.detectChanges();
-    }
-  }
-
-  nextImage() {
-    if (this.imageModalUrls && this.currentImageIndex < this.imageModalUrls.length - 1) {
-      this.currentImageIndex++;
-      this.cdr.detectChanges();
-    }
-  }
+  prevImage() { if (this.imageModalUrls && this.currentImageIndex > 0) this.currentImageIndex--; }
+  nextImage() { if (this.imageModalUrls && this.currentImageIndex < this.imageModalUrls.length - 1) this.currentImageIndex++; }
 
   filterBooks() {
     this.filteredBooks = this.books.filter(book => {
-      const matchesCategory = this.categoryFilter ? book.category === this.categoryFilter : true;
-      const matchesStock = this.stockFilter ? book.stockStatus === this.stockFilter : true;
-      return matchesCategory && matchesStock;
+      const catMatch = this.categoryFilter ? book.category === this.categoryFilter : true;
+      const stockMatch = this.stockFilter ? book.stockStatus === this.stockFilter : true;
+      return catMatch && stockMatch;
     });
     this.sortBooks();
-    this.cdr.detectChanges();
   }
 
   sortBooks() {
@@ -410,6 +317,5 @@ export class BooksControlComponent implements OnInit {
       if (this.sortBy === 'quantity') return a.quantity - b.quantity;
       return a.name.localeCompare(b.name, 'ar');
     });
-    this.cdr.detectChanges();
   }
 }
